@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace Launcher_v2
 {
-    partial class Form1
+    public partial class Form1
     {
         /// <summary>
         /// Required designer variable.
@@ -36,10 +36,10 @@ namespace Launcher_v2
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.strtGameBtn = new System.Windows.Forms.Button();
             this.downloadLbl = new System.Windows.Forms.Label();
-            this.patchNotes = new System.Windows.Forms.WebBrowser();
             this.minimizeBtn = new System.Windows.Forms.Button();
             this.closeBtn = new System.Windows.Forms.Button();
-            this.titleBarPanel = new System.Windows.Forms.Panel();
+            this.patchNotes = new System.Windows.Forms.WebBrowser();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.SuspendLayout();
             // 
             // progressBar1
@@ -86,18 +86,6 @@ namespace Launcher_v2
             this.downloadLbl.Size = new System.Drawing.Size(0, 13);
             this.downloadLbl.TabIndex = 2;
             // 
-            // patchNotes
-            // 
-            this.patchNotes.CausesValidation = false;
-            this.patchNotes.Location = new System.Drawing.Point(0, 0);
-            this.patchNotes.MinimumSize = new System.Drawing.Size(20, 20);
-            this.patchNotes.Name = "patchNotes";
-            this.patchNotes.ScrollBarsEnabled = false;
-            this.patchNotes.Size = new System.Drawing.Size(900, 450);
-            this.patchNotes.TabIndex = 5;
-            this.patchNotes.TabStop = false;
-            this.patchNotes.Url = new System.Uri("http://design5.co/aam_updater/html/", System.UriKind.Absolute);
-            // 
             // minimizeBtn
             // 
             this.minimizeBtn.BackColor = System.Drawing.Color.Transparent;
@@ -128,16 +116,27 @@ namespace Launcher_v2
             this.closeBtn.MouseEnter += new System.EventHandler(this.closeBtn_MouseEnter);
             this.closeBtn.MouseLeave += new System.EventHandler(this.closeBtn_MouseLeave);
             // 
-            // titleBarPanel
+            // patchNotes
             // 
-            this.titleBarPanel.BackColor = System.Drawing.Color.Transparent;
-            this.titleBarPanel.BackgroundImage = global::Launcher_v2.Properties.Resources.bg;
-            this.titleBarPanel.Location = new System.Drawing.Point(0, 0);
-            this.titleBarPanel.Margin = new System.Windows.Forms.Padding(0);
-            this.titleBarPanel.Name = "titleBarPanel";
-            this.titleBarPanel.Size = new System.Drawing.Size(833, 26);
-            this.titleBarPanel.TabIndex = 6;
-            this.titleBarPanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.titleBarPanel_Mousedown);
+            this.patchNotes.CausesValidation = false;
+            this.patchNotes.Location = new System.Drawing.Point(0, 0);
+            this.patchNotes.MinimumSize = new System.Drawing.Size(20, 20);
+            this.patchNotes.Name = "patchNotes";
+            this.patchNotes.ScrollBarsEnabled = false;
+            this.patchNotes.Size = new System.Drawing.Size(900, 450);
+            this.patchNotes.TabIndex = 5;
+            this.patchNotes.TabStop = false;
+            this.patchNotes.Url = new System.Uri(Server + "/html/", System.UriKind.Absolute);
+            // 
+            // panel1
+            // 
+            this.panel1.BackgroundImage = global::Launcher_v2.Properties.Resources.bg;
+            this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(832, 26);
+            this.panel1.TabIndex = 6;
+            this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.titleBarPanel_Mousedown);
             // 
             // Form1
             // 
@@ -149,7 +148,7 @@ namespace Launcher_v2
             this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(900, 450);
             this.ControlBox = false;
-            this.Controls.Add(this.titleBarPanel);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.minimizeBtn);
             this.Controls.Add(this.closeBtn);
             this.Controls.Add(this.downloadLbl);
@@ -163,7 +162,6 @@ namespace Launcher_v2
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "AAF Updater";
-            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -178,8 +176,8 @@ namespace Launcher_v2
         private System.Windows.Forms.Label downloadLbl;
         private System.Windows.Forms.Button closeBtn;
         private System.Windows.Forms.Button minimizeBtn;
+        private System.Windows.Forms.Panel panel1;
         internal System.Windows.Forms.WebBrowser patchNotes;
-        private System.Windows.Forms.Panel titleBarPanel;
     }
 }
 

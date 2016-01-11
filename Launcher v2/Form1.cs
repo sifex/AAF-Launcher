@@ -21,7 +21,7 @@ namespace Launcher_v2
     {
         // Set Server Variable. This should be where index.php, html and the mods folder should be.
         // Eg: http://exmaple.com/Arma3Updater/
-        public string Server = "http://design5.co/aam_updater/";
+        public string Server = "http://mods.australianarmedforces.org/";
 
         public const int WM_NCLBUTTONDOWN = 161;
         public const int HT_CAPTION = 2;
@@ -44,15 +44,6 @@ namespace Launcher_v2
         }
 
         // Makes the main window (Form1) dragable
-        private void Form1_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ReleaseCapture();
-                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
-            }
-        }
-
         private void titleBarPanel_Mousedown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -126,7 +117,7 @@ namespace Launcher_v2
             try
             {
                 HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-                int num1 = 3000;
+                int num1 = 30000;
                 httpWebRequest.Timeout = num1;
                 int num2 = 0;
                 httpWebRequest.AllowAutoRedirect = num2 != 0;
@@ -143,8 +134,6 @@ namespace Launcher_v2
 
         private void changeIEVersion()
         {
-
-
             string regCheck = (string)Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Internet Explorer\\Main\\FeatureControl\\FEATURE_BROWSER_EMULATION", Process.GetCurrentProcess().ProcessName + ".exe", null);
             if (regCheck == null) 
             {
@@ -167,7 +156,6 @@ namespace Launcher_v2
                 RegistryKey Key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
                 Key.SetValue(Process.GetCurrentProcess().ProcessName + ".exe", RegVal, RegistryValueKind.DWord);
                 Key.Close();
-                System.Threading.Thread.Sleep(1000);
                 Process.Start(Application.ExecutablePath); // to start new instance of application
                 this.Close(); //to turn off current app
             }
