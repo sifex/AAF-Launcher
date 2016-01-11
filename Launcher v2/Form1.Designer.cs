@@ -1,4 +1,7 @@
-﻿namespace Launcher_v2
+﻿using System;
+using System.Drawing;
+
+namespace Launcher_v2
 {
     partial class Form1
     {
@@ -36,8 +39,8 @@
             this.patchNotes = new System.Windows.Forms.WebBrowser();
             this.minimizeBtn = new System.Windows.Forms.Button();
             this.closeBtn = new System.Windows.Forms.Button();
+            this.titleBarPanel = new System.Windows.Forms.Panel();
             this.SuspendLayout();
-            
             // 
             // progressBar1
             // 
@@ -86,15 +89,14 @@
             // patchNotes
             // 
             this.patchNotes.CausesValidation = false;
-            this.patchNotes.Location = new System.Drawing.Point(0, 26);
+            this.patchNotes.Location = new System.Drawing.Point(0, 0);
             this.patchNotes.MinimumSize = new System.Drawing.Size(20, 20);
             this.patchNotes.Name = "patchNotes";
             this.patchNotes.ScrollBarsEnabled = false;
-            this.patchNotes.Size = new System.Drawing.Size(900, 430);
+            this.patchNotes.Size = new System.Drawing.Size(900, 450);
             this.patchNotes.TabIndex = 5;
             this.patchNotes.TabStop = false;
             this.patchNotes.Url = new System.Uri("http://design5.co/aam_updater/html/", System.UriKind.Absolute);
-            
             // 
             // minimizeBtn
             // 
@@ -126,6 +128,17 @@
             this.closeBtn.MouseEnter += new System.EventHandler(this.closeBtn_MouseEnter);
             this.closeBtn.MouseLeave += new System.EventHandler(this.closeBtn_MouseLeave);
             // 
+            // titleBarPanel
+            // 
+            this.titleBarPanel.BackColor = System.Drawing.Color.Transparent;
+            this.titleBarPanel.BackgroundImage = global::Launcher_v2.Properties.Resources.bg;
+            this.titleBarPanel.Location = new System.Drawing.Point(0, 0);
+            this.titleBarPanel.Margin = new System.Windows.Forms.Padding(0);
+            this.titleBarPanel.Name = "titleBarPanel";
+            this.titleBarPanel.Size = new System.Drawing.Size(833, 26);
+            this.titleBarPanel.TabIndex = 6;
+            this.titleBarPanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.titleBarPanel_Mousedown);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -136,6 +149,7 @@
             this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(900, 450);
             this.ControlBox = false;
+            this.Controls.Add(this.titleBarPanel);
             this.Controls.Add(this.minimizeBtn);
             this.Controls.Add(this.closeBtn);
             this.Controls.Add(this.downloadLbl);
@@ -165,6 +179,7 @@
         private System.Windows.Forms.Button closeBtn;
         private System.Windows.Forms.Button minimizeBtn;
         internal System.Windows.Forms.WebBrowser patchNotes;
+        private System.Windows.Forms.Panel titleBarPanel;
     }
 }
 

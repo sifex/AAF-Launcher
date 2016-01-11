@@ -103,6 +103,7 @@
   <ItemGroup>
     <Content Include="favicon.ico" />
     <Content Include="Resources\aaf.ico" />
+    <Content Include="Resources\bg.png" />
     <None Include="Resources\minimize2.png" />
     <None Include="Resources\minimize1.png" />
     <None Include="Resources\close2.png" />

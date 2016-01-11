@@ -44,8 +44,16 @@ namespace Launcher_v2
         }
 
         // Makes the main window (Form1) dragable
-        private void Form1_MouseDown(object sender,
-        System.Windows.Forms.MouseEventArgs e)
+        private void Form1_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ReleaseCapture();
+                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+            }
+        }
+
+        private void titleBarPanel_Mousedown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -135,12 +143,10 @@ namespace Launcher_v2
 
         private void changeIEVersion()
         {
-            int BrowserVer, RegVal;
+            int RegVal;
+            int BrowserVer = 11;
 
-            // Get the installed IE version
-            using (WebBrowser Wb = new WebBrowser())
-                BrowserVer = Wb.Version.Major;
-
+            
             // Set the appropriate IE version
             if (BrowserVer >= 11)
                 RegVal = 11001;
@@ -166,6 +172,7 @@ namespace Launcher_v2
             // Eg. "c:/program files (x86)/steam/steamapps/common/Arma 3"
             string Root = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3";
 
+            changeIEVersion();
 
             XDocument xdocument = XDocument.Load(this.Server + "/index.php");
 
