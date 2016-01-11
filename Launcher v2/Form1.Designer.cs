@@ -40,15 +40,16 @@ namespace Launcher_v2
             this.closeBtn = new System.Windows.Forms.Button();
             this.patchNotes = new System.Windows.Forms.WebBrowser();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.progressBar2 = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
             // progressBar1
             // 
             this.progressBar1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(53)))), ((int)(((byte)(70)))));
             this.progressBar1.ForeColor = System.Drawing.Color.DarkRed;
-            this.progressBar1.Location = new System.Drawing.Point(14, 402);
+            this.progressBar1.Location = new System.Drawing.Point(14, 401);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(710, 32);
+            this.progressBar1.Size = new System.Drawing.Size(710, 11);
             this.progressBar1.TabIndex = 0;
             // 
             // backgroundWorker1
@@ -138,6 +139,16 @@ namespace Launcher_v2
             this.panel1.TabIndex = 6;
             this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.titleBarPanel_Mousedown);
             // 
+            // progressBar2
+            // 
+            this.progressBar2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(53)))), ((int)(((byte)(70)))));
+            this.progressBar2.ForeColor = System.Drawing.Color.DarkRed;
+            this.progressBar2.Location = new System.Drawing.Point(14, 416);
+            this.progressBar2.Name = "progressBar2";
+            this.progressBar2.Size = new System.Drawing.Size(710, 19);
+            this.progressBar2.Step = 1;
+            this.progressBar2.TabIndex = 7;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -148,6 +159,7 @@ namespace Launcher_v2
             this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(900, 450);
             this.ControlBox = false;
+            this.Controls.Add(this.progressBar2);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.minimizeBtn);
             this.Controls.Add(this.closeBtn);
@@ -178,6 +190,7 @@ namespace Launcher_v2
         private System.Windows.Forms.Button minimizeBtn;
         private System.Windows.Forms.Panel panel1;
         internal System.Windows.Forms.WebBrowser patchNotes;
+        private System.Windows.Forms.ProgressBar progressBar2;
     }
 }
 

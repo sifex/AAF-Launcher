@@ -34,6 +34,8 @@ namespace Launcher_v2
 
         public Form1()
         {
+            changeIEVersion();
+
             InitializeComponent();
 
             // Download progress
@@ -134,11 +136,11 @@ namespace Launcher_v2
 
         private void changeIEVersion()
         {
-            string regCheck = (string)Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Internet Explorer\\Main\\FeatureControl\\FEATURE_BROWSER_EMULATION", Process.GetCurrentProcess().ProcessName + ".exe", null);
+            object regCheck = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Internet Explorer\\Main\\FeatureControl\\FEATURE_BROWSER_EMULATION", Process.GetCurrentProcess().ProcessName + ".exe", null);
             if (regCheck == null) 
             {
                 int RegVal;
-                int BrowserVer = 11;
+                int BrowserVer = 9;
 
                 // Set the appropriate IE version
                 if (BrowserVer >= 11)
@@ -156,80 +158,89 @@ namespace Launcher_v2
                 RegistryKey Key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
                 Key.SetValue(Process.GetCurrentProcess().ProcessName + ".exe", RegVal, RegistryValueKind.DWord);
                 Key.Close();
-                Process.Start(Application.ExecutablePath); // to start new instance of application
-                this.Close(); //to turn off current app
             }
         }
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             
-            // Defining Root String
+            // Defining Root String (ARMA 3 Root Direcotry)
             // Eg. "c:/program files (x86)/steam/steamapps/common/Arma 3"
             string Root = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3";
-
-            changeIEVersion();
-
+           
+            // Loads Server Repos XML
             XDocument xdocument = XDocument.Load(this.Server + "/index.php");
-
+            
+            // Fetches ModRoot Directory from Server, or Defaults to /Server_Mods/
+            // Don't use /Mods/ as a folder as your clan will bug you to ask where their custom 1337 mods have gone! 
+            // Eg. Root + /Mods_AAF/
             string ModsRoot = Root + "/Server_Mods/";
-
             foreach (XElement xelement in xdocument.Descendants((XName)"modDir"))
             {
                 ModsRoot = Root + "/" + xelement.Element((XName)"name").Value + "/";
             }
+
+            // Create Directory if it doesn't already exist (Creates ModRoot)
             if (!Directory.Exists(ModsRoot))
             {
                 Directory.CreateDirectory(ModsRoot);
             }
+
+            /////////////////////////////////////////////////////////////////////////////////
+            // Deletes all Directories other than ones that exist in the Server Repos List //
+            /////////////////////////////////////////////////////////////////////////////////
+
+            // Fetches all Dirs from XML
             List<string> dbDirs = new List<string>();
-            foreach (XElement xelement in xdocument.Descendants((XName)"directory"))
+            foreach (XElement dir in xdocument.Descendants((XName)"directory"))
             {
-                dbDirs.Add(Root + xelement.Element((XName)"name").Value);
+                dbDirs.Add(Root + dir.Element((XName)"name").Value);
             }
-
+            // Fetches all Dirs from Local
             List<string> allDirs = new List<string>();
-            foreach (string str2 in Directory.GetDirectories(ModsRoot, "*", SearchOption.AllDirectories))
-                allDirs.Add(str2.Replace("\\", "/"));
-            foreach (string path2 in Enumerable.Except<string>((IEnumerable<string>)allDirs, (IEnumerable<string>)dbDirs, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase))
+            foreach (string dir in Directory.GetDirectories(ModsRoot, "*", SearchOption.AllDirectories))
             {
-                try
-                {
-                    Directory.Delete(path2, true);
-                }
-                catch (IOException ex)
-                {
-                }
+                allDirs.Add(dir.Replace("\\", "/"));
+            }
+            // Delete the difference
+            foreach (string dir in Enumerable.Except<string>((IEnumerable<string>)allDirs, (IEnumerable<string>)dbDirs, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase))
+            {
+                Directory.Delete(dir, true);
+            }
+
+            ///////////////////////////////////////////////////////////////////////////
+            // Deletes all Files other than ones that exist in the Server Repos List //
+            ///////////////////////////////////////////////////////////////////////////
+
+            // Fetches all Files from XML
+            List<string> dbFiles = new List<string>();
+            foreach (XElement file in xdocument.Descendants((XName)"file"))
+            {
+                dbFiles.Add(Root + file.Element((XName)"name").Value);
+            }
+            // Fetches all Files from Local
+            List<string> allFiles = new List<string>();
+            foreach (string file in Directory.GetFiles(ModsRoot, "*", SearchOption.AllDirectories))
+            {
+                allFiles.Add(file.Replace("\\", "/"));
+            }
+            // Delete the difference
+            foreach (string file in Enumerable.Except<string>((IEnumerable<string>)allFiles, (IEnumerable<string>)dbFiles, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase))
+            {
+                System.IO.File.Delete(file);
             }
 
 
-            List<string> list3 = new List<string>();
-            foreach (XElement xelement in xdocument.Descendants((XName)"file"))
-                list3.Add(Root + xelement.Element((XName)"name").Value);
-            List<string> list4 = new List<string>();
-            foreach (string str2 in Directory.GetFiles(ModsRoot, "*", SearchOption.AllDirectories))
-                list4.Add(str2.Replace("\\", "/"));
-            foreach (string path2 in Enumerable.Except<string>((IEnumerable<string>)list4, (IEnumerable<string>)list3, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase))
+
+            foreach (XContainer xcontainer in xdocument.Descendants("directory"))
             {
-                try
-                {
-                    System.IO.File.Delete(path2);
-                }
-                catch (IOException ex)
-                {
-                }
-            }
-            foreach (XContainer xcontainer in xdocument.Descendants((XName)"directory"))
-            {
-                string str2 = xcontainer.Element((XName)"name").Value;
+                string str2 = xcontainer.Element("name").Value;
                 Directory.CreateDirectory(Root + str2);
             }
-            foreach (XElement xelement in xdocument.Descendants((XName)"file"))
+            foreach (XElement xelement in xdocument.Descendants("file"))
             {
-                XName name1 = (XName)"name";
-                string str2 = xelement.Element(name1).Value;
-                XName name2 = (XName)"hash";
-                string a = xelement.Element(name2).Value;
+                string str2 = xelement.Element("name").Value;
+                string a = xelement.Element("hash").Value;
                 string sUrlToReadFileFrom = this.Server + str2;
                 string str3 = Root + str2;
                 if (Root != null)
@@ -239,7 +250,7 @@ namespace Launcher_v2
                         if (System.IO.File.Exists(Root + str2))
                         {
                             FileStream stream = System.IO.File.OpenRead(Root + str2);
-                            string b = this.HashFile(stream);
+                            string b = HashFile(stream);
                             if (!string.Equals(a, b))
                             {
                                 stream.Close();
@@ -248,9 +259,12 @@ namespace Launcher_v2
                             }
                         }
                         else
+                        {
                             this.downloadFile(sUrlToReadFileFrom, str3);
+                        }
                     }
                 }
+                progressBar2.PerformStep();
             }
         }
 
@@ -264,14 +278,14 @@ namespace Launcher_v2
             {
                 using (Stream stream1 = webClient.OpenRead(new Uri(sUrlToReadFileFrom)))
                 {
-                    using (Stream stream2 = (Stream)new FileStream(sFilePathToWriteFileTo, FileMode.Create, FileAccess.Write, FileShare.None))
+                    using (Stream stream2 = new FileStream(sFilePathToWriteFileTo, FileMode.Create, FileAccess.Write, FileShare.None))
                     {
                         byte[] buffer = new byte[contentLength];
                         int count;
                         while ((count = stream1.Read(buffer, 0, buffer.Length)) > 0)
                         {
                             stream2.Write(buffer, 0, count);
-                            num += (long)count;
+                            num += count;
                             this.backgroundWorker1.ReportProgress((int)((double)num / (double)buffer.Length * 100.0));
                         }
                         stream2.Close();
