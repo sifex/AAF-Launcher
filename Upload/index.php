@@ -1,6 +1,6 @@
 <?php
 	
-	$modDir = "./Mods_AF";
+	$modDir = "./Mods_AAF";
 
 	function getDirMap($dir) {
 		$root = $dir;
