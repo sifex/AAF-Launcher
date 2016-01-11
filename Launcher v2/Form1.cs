@@ -19,13 +19,13 @@ namespace Launcher_v2
 {
     public partial class Form1 : Form
     {
-
+        // Set Server Variable. This should be where index.php, html and the mods folder should be.
+        // Eg: http://exmaple.com/Arma3Updater/
         public string Server = "http://design5.co/aam_updater/";
 
         public const int WM_NCLBUTTONDOWN = 161;
         public const int HT_CAPTION = 2;
-
-
+        
         [DllImportAttribute("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd,
                          int Msg, int wParam, int lParam);
@@ -36,13 +36,14 @@ namespace Launcher_v2
         {
             InitializeComponent();
 
-            //Download progress
+            // Download progress
             backgroundWorker1.RunWorkerAsync();
 
+            // Disable Start Game Button for now
             strtGameBtn.Enabled = false;
         }
 
-        //Makes the form dragable
+        // Makes the main window (Form1) dragable
         private void Form1_MouseDown(object sender,
         System.Windows.Forms.MouseEventArgs e)
         {
@@ -53,7 +54,7 @@ namespace Launcher_v2
             }
         }
 
-        //Close Button
+        // Close Button
         private void closeBtn_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -61,15 +62,15 @@ namespace Launcher_v2
 
         private void closeBtn_MouseEnter(object sender, EventArgs e)
         {
-            closeBtn.BackgroundImage = Properties.Resources.close2;
+            closeBtn.BackgroundImage = Properties.Resources.close1;
         }
 
         private void closeBtn_MouseLeave(object sender, EventArgs e)
         {
-            closeBtn.BackgroundImage = Properties.Resources.close1;
+            closeBtn.BackgroundImage = Properties.Resources.close2;
         }
 
-        //Minimize Button
+        // Minimize Button
         private void minimizeBtn_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Minimized;
@@ -77,12 +78,12 @@ namespace Launcher_v2
 
         private void minimizeBtn_MouseEnter(object sender, EventArgs e)
         {
-            minimizeBtn.BackgroundImage = Properties.Resources.minimize2;
+            minimizeBtn.BackgroundImage = Properties.Resources.minimize1;
         }
 
         private void minimizeBtn_MouseLeave(object sender, EventArgs e)
         {
-            minimizeBtn.BackgroundImage = Properties.Resources.minimize1;
+            minimizeBtn.BackgroundImage = Properties.Resources.minimize2;
         }
 
         //Delete File
@@ -136,11 +137,11 @@ namespace Launcher_v2
         {
             int BrowserVer, RegVal;
 
-            // get the installed IE version
+            // Get the installed IE version
             using (WebBrowser Wb = new WebBrowser())
                 BrowserVer = Wb.Version.Major;
 
-            // set the appropriate IE version
+            // Set the appropriate IE version
             if (BrowserVer >= 11)
                 RegVal = 11001;
             else if (BrowserVer == 10)
@@ -160,8 +161,11 @@ namespace Launcher_v2
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-            // Defining Root 
+            
+            // Defining Root String
+            // Eg. "c:/program files (x86)/steam/steamapps/common/Arma 3"
             string Root = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3";
+
 
             XDocument xdocument = XDocument.Load(this.Server + "/index.php");
 

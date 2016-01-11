@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("AAF Updater")]
-[assembly: AssemblyDescription("Updater for the ARMA 3 Platform")]
+[assembly: AssemblyDescription("Updater for the ARMA 3 Modding Platform - Australian Armed Forces")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Australian Armed Forces")]
 [assembly: AssemblyProduct("AAF Updater")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyCopyright("Copyright © 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
