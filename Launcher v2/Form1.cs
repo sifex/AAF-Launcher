@@ -39,6 +39,9 @@ namespace Launcher_v2
 
             InitializeComponent();
 
+            this.downloadLbl.ForeColor = Color.Silver;
+            this.downloadLbl.Text = "Fetching Repo";
+
             // Download progress
             backgroundWorker1.RunWorkerAsync();
 
@@ -172,7 +175,7 @@ namespace Launcher_v2
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-            
+
             // Defining Root String (ARMA 3 Root Direcotry)
             // Eg. "c:/program files (x86)/steam/steamapps/common/Arma 3"
             string Root = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3";
@@ -253,6 +256,7 @@ namespace Launcher_v2
                 string a = xelement.Element("hash").Value;
                 string sUrlToReadFileFrom = this.Server + str2;
                 string str3 = Root + str2;
+                double percent = (double)filesDone*710 / fileList ;
                 if (Root != null)
                 {
                     using (MD5.Create())
@@ -266,20 +270,21 @@ namespace Launcher_v2
                             {
                                 stream.Close();
                                 Form1.deleteFile(str3);
-                                this.downloadFile(sUrlToReadFileFrom, str3);
+                                this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                             }
+                            filesDone++;
                         }
                         else
                         {
-                            this.downloadFile(sUrlToReadFileFrom, str3);
+                            this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
+                            filesDone++;
                         }
                     }
                 }
             }
             initComplete = true;
         }
-
-        public void downloadFile(string sUrlToReadFileFrom, string sFilePathToWriteFileTo)
+        public void downloadFile(string sUrlToReadFileFrom, string sFilePathToWriteFileTo, double percent, int fileList)
         {
             HttpWebResponse httpWebResponse = (HttpWebResponse)WebRequest.Create(new Uri(sUrlToReadFileFrom)).GetResponse();
             httpWebResponse.Close();
@@ -297,7 +302,7 @@ namespace Launcher_v2
                         {
                             stream2.Write(buffer, 0, count);
                             num += count;
-                            this.backgroundWorker1.ReportProgress((int)((double)num / (double)buffer.Length * 100.0));
+                            backgroundWorker1.ReportProgress((int)(percent + (int)((double)num / (double)buffer.Length / fileList)));
                         }
                         stream2.Close();
                     }
@@ -315,7 +320,7 @@ namespace Launcher_v2
             }
             else
             {
-                this.progressBar1.Value = e.ProgressPercentage;
+                this.pictureBox1.Size = new Size(e.ProgressPercentage, 31);
                 this.downloadLbl.ForeColor = System.Drawing.Color.Silver;
                 this.downloadLbl.Text = "Downloading Updates";
             }

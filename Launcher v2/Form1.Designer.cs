@@ -32,7 +32,6 @@ namespace Launcher_v2
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.strtGameBtn = new System.Windows.Forms.Button();
             this.downloadLbl = new System.Windows.Forms.Label();
@@ -43,15 +42,6 @@ namespace Launcher_v2
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
-            // 
-            // progressBar1
-            // 
-            this.progressBar1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(53)))), ((int)(((byte)(70)))));
-            this.progressBar1.ForeColor = System.Drawing.Color.DarkRed;
-            this.progressBar1.Location = new System.Drawing.Point(14, 401);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(710, 11);
-            this.progressBar1.TabIndex = 0;
             // 
             // backgroundWorker1
             // 
@@ -143,12 +133,11 @@ namespace Launcher_v2
             // pictureBox1
             // 
             this.pictureBox1.BackColor = System.Drawing.Color.DodgerBlue;
-            this.pictureBox1.Location = new System.Drawing.Point(14, 416);
+            this.pictureBox1.Location = new System.Drawing.Point(14, 404);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(0);
-            this.pictureBox1.MaximumSize = new System.Drawing.Size(710, 19);
-            this.pictureBox1.MinimumSize = new System.Drawing.Size(0, 19);
+            this.pictureBox1.MaximumSize = new System.Drawing.Size(710, 31);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(710, 19);
+            this.pictureBox1.Size = new System.Drawing.Size(710, 31);
             this.pictureBox1.TabIndex = 8;
             this.pictureBox1.TabStop = false;
             // 
@@ -168,7 +157,6 @@ namespace Launcher_v2
             this.Controls.Add(this.closeBtn);
             this.Controls.Add(this.downloadLbl);
             this.Controls.Add(this.strtGameBtn);
-            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.patchNotes);
             this.ForeColor = System.Drawing.Color.White;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -185,8 +173,6 @@ namespace Launcher_v2
 
 
         #endregion
-
-        private System.Windows.Forms.ProgressBar progressBar1;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.Button strtGameBtn;
         private System.Windows.Forms.Label downloadLbl;
