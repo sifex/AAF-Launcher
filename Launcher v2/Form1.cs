@@ -198,6 +198,8 @@ namespace Launcher_v2
                 Directory.CreateDirectory(ModsRoot);
             }
 
+            initComplete = true;
+
             /////////////////////////////////////////////////////////////////////////////////
             // Deletes all Directories other than ones that exist in the Server Repos List //
             /////////////////////////////////////////////////////////////////////////////////
@@ -256,7 +258,7 @@ namespace Launcher_v2
                 string a = xelement.Element("hash").Value;
                 string sUrlToReadFileFrom = this.Server + str2;
                 string str3 = Root + str2;
-                double percent = (double)filesDone*710 / fileList ;
+                double percent = (double)filesDone*710/fileList ;
                 if (Root != null)
                 {
                     using (MD5.Create())
@@ -265,24 +267,23 @@ namespace Launcher_v2
                         {
                             this.backgroundWorker1.ReportProgress(-1);
                             FileStream stream = System.IO.File.OpenRead(Root + str2);
-                            string b = generateHash(stream.ToString());
+                            string b = HashFile(stream);
                             if (!string.Equals(a, b))
                             {
                                 stream.Close();
                                 Form1.deleteFile(str3);
                                 this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                             }
-                            filesDone++;
                         }
                         else
                         {
                             this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
-                            filesDone++;
                         }
                     }
                 }
+                filesDone++;
+                backgroundWorker1.ReportProgress((int)(percent));
             }
-            initComplete = true;
         }
         public void downloadFile(string sUrlToReadFileFrom, string sFilePathToWriteFileTo, double percent, int fileList)
         {
@@ -315,13 +316,13 @@ namespace Launcher_v2
         {
             if(e.ProgressPercentage == -1)
             {
-                this.downloadLbl.ForeColor = System.Drawing.Color.Silver;
+                this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
                 this.downloadLbl.Text = "Checking Mods";
             }
             else
             {
                 this.pictureBox1.Size = new Size(e.ProgressPercentage, 31);
-                this.downloadLbl.ForeColor = System.Drawing.Color.Silver;
+                this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
                 this.downloadLbl.Text = "Downloading Updates";
             }
         }
@@ -344,7 +345,7 @@ namespace Launcher_v2
         //Starts the game
         private void strtGameBtn_Click(object sender, EventArgs e)
         {
-            Process.Start("SFrame.exe", "/auth_ip: 127.0.0.1 /locale:ASCII /country:US /cash /commercial_shop");
+            // Process.Start("SFrame.exe", "/auth_ip: 127.0.0.1 /locale:ASCII /country:US /cash /commercial_shop");
             this.Close();
         }
     }

@@ -40,7 +40,9 @@ namespace Launcher_v2
             this.patchNotes = new System.Windows.Forms.WebBrowser();
             this.panel1 = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
             // 
             // backgroundWorker1
@@ -137,9 +139,20 @@ namespace Launcher_v2
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBox1.MaximumSize = new System.Drawing.Size(710, 31);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(710, 31);
+            this.pictureBox1.Size = new System.Drawing.Size(0, 31);
             this.pictureBox1.TabIndex = 8;
             this.pictureBox1.TabStop = false;
+            // 
+            // pictureBox2
+            // 
+            this.pictureBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(75)))), ((int)(((byte)(107)))));
+            this.pictureBox2.Location = new System.Drawing.Point(14, 404);
+            this.pictureBox2.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBox2.MaximumSize = new System.Drawing.Size(710, 31);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(710, 31);
+            this.pictureBox2.TabIndex = 9;
+            this.pictureBox2.TabStop = false;
             // 
             // Form1
             // 
@@ -152,6 +165,7 @@ namespace Launcher_v2
             this.ClientSize = new System.Drawing.Size(900, 450);
             this.ControlBox = false;
             this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.minimizeBtn);
             this.Controls.Add(this.closeBtn);
@@ -166,6 +180,7 @@ namespace Launcher_v2
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "AAF Updater";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -181,6 +196,7 @@ namespace Launcher_v2
         private System.Windows.Forms.Panel panel1;
         internal System.Windows.Forms.WebBrowser patchNotes;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox pictureBox2;
     }
 }
 
