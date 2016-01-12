@@ -40,15 +40,20 @@ namespace Launcher_v2
             changeIEVersion();
 
             InitializeComponent();
-
-            this.downloadLbl.ForeColor = Color.Silver;
-            this.downloadLbl.Text = "Fetching Repo";
+            postStartup();
 
             // Download progress
             backgroundWorker1.RunWorkerAsync();
 
             // Disable Start Game Button for now
             strtGameBtn.Enabled = false;
+        }
+
+        public void postStartup()
+        {
+            this.patchNotes.Refresh(WebBrowserRefreshOption.Completely);
+            this.downloadLbl.ForeColor = Color.Silver;
+            this.downloadLbl.Text = "Fetching Repo";
         }
 
         public void checkVersion()
@@ -58,11 +63,10 @@ namespace Launcher_v2
 
             if(versionNo != Version)
             {
-                MessageBox.Show("This Version is out of date, please download the updated version");
-                Process.Start("http://mods.australianarmedforces.org");
+                MessageBox.Show("This version is out of date, please download the updated version.");
+                Process.Start("http://mods.australianarmedforces.org/?update");
                 Environment.Exit(0);
             }
-
         }
 
         // Makes the main window (Form1) dragable
@@ -274,7 +278,7 @@ namespace Launcher_v2
                 string a = xelement.Element("hash").Value;
                 string sUrlToReadFileFrom = this.Server + str2;
                 string str3 = Root + str2;
-                double percent = (double)filesDone*710/fileList;
+                double percent = (double)filesDone/fileList;
                 if (Root != null)
                 {
                     using (MD5.Create())
@@ -288,18 +292,38 @@ namespace Launcher_v2
                                 stream.Close();
                                 Form1.deleteFile(str3);
                                 this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
+                                this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0); }));
+                            }
+                            else
+                            {
+                                this.Invoke(new Action(() => { downloadLbl_Controller(percent, 1); }));
                             }
                         }
                         else
                         {
                             this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
+                            this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0); }));
                         }
                     }
                 }
                 filesDone++;
-                backgroundWorker1.ReportProgress((int)(percent));
+                backgroundWorker1.ReportProgress((int)(percent*710));
             }
         }
+
+        public void downloadLbl_Controller(double percentage, int type)
+        {
+            this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
+            if (type == 1)
+            {
+                this.downloadLbl.Text = "Checking Mods";
+            } else
+            {
+                this.downloadLbl.Text = "Downloading Updates";
+            }
+            this.downloadLbl.Text = this.downloadLbl.Text + " - " + (Math.Round((double)(percentage * 100),2).ToString()) + "%";
+        }
+
         public void downloadFile(string sUrlToReadFileFrom, string sFilePathToWriteFileTo, double percent, int fileList)
         {
             HttpWebResponse httpWebResponse = (HttpWebResponse)WebRequest.Create(new Uri(sUrlToReadFileFrom)).GetResponse();
@@ -318,7 +342,7 @@ namespace Launcher_v2
                         {
                             stream2.Write(buffer, 0, count);
                             num += count;
-                            backgroundWorker1.ReportProgress((int)(percent + (int)((double)num / (double)buffer.Length / fileList)));
+                            backgroundWorker1.ReportProgress((int)(percent/10 + (int)((double)num / (double)buffer.Length / fileList)));
                         }
                         stream2.Close();
                     }
@@ -329,10 +353,7 @@ namespace Launcher_v2
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
             this.pictureBox1.Size = new Size(e.ProgressPercentage, 31);
-            this.downloadLbl.Text = "Checking Mods / Downloading Updates";
-            this.downloadLbl.Text = this.downloadLbl.Text + " - " + ((double)(e.ProgressPercentage/710*100)).ToString();
         }
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
