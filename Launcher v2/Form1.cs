@@ -22,6 +22,7 @@ namespace Launcher_v2
         // Set Server Variable. This should be where index.php, html and the mods folder should be.
         // Eg: http://exmaple.com/Arma3Updater/
         public string Server = "http://mods.australianarmedforces.org/";
+        public string Version = "0.3";
         public bool initComplete = false;
 
         public const int WM_NCLBUTTONDOWN = 161;
@@ -35,6 +36,7 @@ namespace Launcher_v2
 
         public Form1()
         {
+            checkVersion();
             changeIEVersion();
 
             InitializeComponent();
@@ -47,6 +49,20 @@ namespace Launcher_v2
 
             // Disable Start Game Button for now
             strtGameBtn.Enabled = false;
+        }
+
+        public void checkVersion()
+        {
+            var versionURL = @"http://mods.australianarmedforces.org/version.txt";
+            var versionNo = (new WebClient()).DownloadString(versionURL);
+
+            if(versionNo != Version)
+            {
+                MessageBox.Show("This Version is out of date, please download the updated version");
+                Process.Start("http://mods.australianarmedforces.org");
+                Environment.Exit(0);
+            }
+
         }
 
         // Makes the main window (Form1) dragable
@@ -152,7 +168,7 @@ namespace Launcher_v2
             if (regCheck == null) 
             {
                 int RegVal;
-                int BrowserVer = 9;
+                int BrowserVer = 11;
 
                 // Set the appropriate IE version
                 if (BrowserVer >= 11)
@@ -181,7 +197,7 @@ namespace Launcher_v2
             string Root = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3";
            
             // Loads Server Repos XML
-            XDocument xmlRepo = XDocument.Load(this.Server + "/index.php");
+            XDocument xmlRepo = XDocument.Load(this.Server + "/repo.php?modAuth=24ERpTrR2LDH9xj2MZAwZMY2mkde");
             
             // Fetches ModRoot Directory from Server, or Defaults to /Server_Mods/
             // Don't use /Mods/ as a folder as your clan will bug you to ask where their custom 1337 mods have gone! 
@@ -258,14 +274,13 @@ namespace Launcher_v2
                 string a = xelement.Element("hash").Value;
                 string sUrlToReadFileFrom = this.Server + str2;
                 string str3 = Root + str2;
-                double percent = (double)filesDone*710/fileList ;
+                double percent = (double)filesDone*710/fileList;
                 if (Root != null)
                 {
                     using (MD5.Create())
                     {
                         if (System.IO.File.Exists(Root + str2))
                         {
-                            this.backgroundWorker1.ReportProgress(-1);
                             FileStream stream = System.IO.File.OpenRead(Root + str2);
                             string b = HashFile(stream);
                             if (!string.Equals(a, b))
@@ -314,17 +329,10 @@ namespace Launcher_v2
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            if(e.ProgressPercentage == -1)
-            {
-                this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
-                this.downloadLbl.Text = "Checking Mods";
-            }
-            else
-            {
-                this.pictureBox1.Size = new Size(e.ProgressPercentage, 31);
-                this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
-                this.downloadLbl.Text = "Downloading Updates";
-            }
+            this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
+            this.pictureBox1.Size = new Size(e.ProgressPercentage, 31);
+            this.downloadLbl.Text = "Checking Mods / Downloading Updates";
+            this.downloadLbl.Text = this.downloadLbl.Text + " - " + ((double)(e.ProgressPercentage/710*100)).ToString();
         }
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -332,8 +340,10 @@ namespace Launcher_v2
             this.strtGameBtn.Enabled = true;
             if (initComplete)
             {
-                this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
+                this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(100, 206, 63);
                 this.downloadLbl.Text = "Mods are up to date";
+                this.pictureBox1.Size = new Size(710, 31);
+                this.pictureBox1.BackColor = System.Drawing.Color.FromArgb(100, 206, 63);
             }
             else
             {
@@ -345,7 +355,7 @@ namespace Launcher_v2
         //Starts the game
         private void strtGameBtn_Click(object sender, EventArgs e)
         {
-            // Process.Start("SFrame.exe", "/auth_ip: 127.0.0.1 /locale:ASCII /country:US /cash /commercial_shop");
+            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/Arma3.exe", "-nosplash -skipIntro -mod=Mods_AAF/@aam;Mods_AAF/@ace3;Mods_AAF/@ares;Mods_AAF/@asr_ai3;Mods_AAF/@atlas_lhd;Mods_AAF/@cba_a3;Mods_AAF/@fa18x_black_wasp;Mods_AAF/@fallujah1_2;Mods_AAF/@js_jc_su35;Mods_AAF/@melb;Mods_AAF/@mrt_accfncs;Mods_AAF/@rhs_afrf;Mods_AAF/@rhs_usf;Mods_AAF/@st_gi;Mods_AAF/@sthud_a3;Mods_AAF/@sub_insurgents;Mods_AAF/@task_force_radio");
             this.Close();
         }
     }

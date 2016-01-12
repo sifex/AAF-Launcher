@@ -74,7 +74,7 @@ namespace Launcher_v2
             this.downloadLbl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
             this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(121)))), ((int)(((byte)(203)))));
             this.downloadLbl.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.downloadLbl.Location = new System.Drawing.Point(15, 380);
+            this.downloadLbl.Location = new System.Drawing.Point(14, 380);
             this.downloadLbl.Name = "downloadLbl";
             this.downloadLbl.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.downloadLbl.Size = new System.Drawing.Size(0, 13);
@@ -145,7 +145,7 @@ namespace Launcher_v2
             // 
             // pictureBox2
             // 
-            this.pictureBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(75)))), ((int)(((byte)(107)))));
+            this.pictureBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(15)))), ((int)(((byte)(32)))));
             this.pictureBox2.Location = new System.Drawing.Point(14, 404);
             this.pictureBox2.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBox2.MaximumSize = new System.Drawing.Size(710, 31);
