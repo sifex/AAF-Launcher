@@ -22,6 +22,7 @@ namespace Launcher_v2
         // Set Server Variable. This should be where index.php, html and the mods folder should be.
         // Eg: http://exmaple.com/Arma3Updater/
         public string Server = "http://mods.australianarmedforces.org/";
+        public bool initComplete = false;
 
         public const int WM_NCLBUTTONDOWN = 161;
         public const int HT_CAPTION = 2;
@@ -112,6 +113,14 @@ namespace Launcher_v2
                 stream.Seek(0L, SeekOrigin.Begin);
             }
             return stringBuilder.ToString();
+
+        }
+
+        static string generateHash(string input)
+        {
+            MD5 md5Hasher = MD5.Create();
+            byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(input));
+            return BitConverter.ToString(data);
         }
 
         private bool ServerStatus(string url)
@@ -169,13 +178,13 @@ namespace Launcher_v2
             string Root = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3";
            
             // Loads Server Repos XML
-            XDocument xdocument = XDocument.Load(this.Server + "/index.php");
+            XDocument xmlRepo = XDocument.Load(this.Server + "/index.php");
             
             // Fetches ModRoot Directory from Server, or Defaults to /Server_Mods/
             // Don't use /Mods/ as a folder as your clan will bug you to ask where their custom 1337 mods have gone! 
             // Eg. Root + /Mods_AAF/
             string ModsRoot = Root + "/Server_Mods/";
-            foreach (XElement xelement in xdocument.Descendants((XName)"modDir"))
+            foreach (XElement xelement in xmlRepo.Descendants((XName)"modDir"))
             {
                 ModsRoot = Root + "/" + xelement.Element((XName)"name").Value + "/";
             }
@@ -192,7 +201,7 @@ namespace Launcher_v2
 
             // Fetches all Dirs from XML
             List<string> dbDirs = new List<string>();
-            foreach (XElement dir in xdocument.Descendants((XName)"directory"))
+            foreach (XElement dir in xmlRepo.Descendants((XName)"directory"))
             {
                 dbDirs.Add(Root + dir.Element((XName)"name").Value);
             }
@@ -214,7 +223,7 @@ namespace Launcher_v2
 
             // Fetches all Files from XML
             List<string> dbFiles = new List<string>();
-            foreach (XElement file in xdocument.Descendants((XName)"file"))
+            foreach (XElement file in xmlRepo.Descendants((XName)"file"))
             {
                 dbFiles.Add(Root + file.Element((XName)"name").Value);
             }
@@ -231,13 +240,14 @@ namespace Launcher_v2
             }
 
 
-
-            foreach (XContainer xcontainer in xdocument.Descendants("directory"))
+            int filesDone = 0;
+            int fileList = xmlRepo.Descendants("file").Count();
+            foreach (XContainer xcontainer in xmlRepo.Descendants("directory"))
             {
                 string str2 = xcontainer.Element("name").Value;
                 Directory.CreateDirectory(Root + str2);
             }
-            foreach (XElement xelement in xdocument.Descendants("file"))
+            foreach (var xelement in xmlRepo.Descendants("file"))
             {
                 string str2 = xelement.Element("name").Value;
                 string a = xelement.Element("hash").Value;
@@ -249,8 +259,9 @@ namespace Launcher_v2
                     {
                         if (System.IO.File.Exists(Root + str2))
                         {
+                            this.backgroundWorker1.ReportProgress(-1);
                             FileStream stream = System.IO.File.OpenRead(Root + str2);
-                            string b = HashFile(stream);
+                            string b = generateHash(stream.ToString());
                             if (!string.Equals(a, b))
                             {
                                 stream.Close();
@@ -264,8 +275,8 @@ namespace Launcher_v2
                         }
                     }
                 }
-                progressBar2.PerformStep();
             }
+            initComplete = true;
         }
 
         public void downloadFile(string sUrlToReadFileFrom, string sFilePathToWriteFileTo)
@@ -297,15 +308,23 @@ namespace Launcher_v2
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            this.progressBar1.Value = e.ProgressPercentage;
-            this.downloadLbl.ForeColor = System.Drawing.Color.Silver;
-            this.downloadLbl.Text = "Downloading Updates";
+            if(e.ProgressPercentage == -1)
+            {
+                this.downloadLbl.ForeColor = System.Drawing.Color.Silver;
+                this.downloadLbl.Text = "Checking Mods";
+            }
+            else
+            {
+                this.progressBar1.Value = e.ProgressPercentage;
+                this.downloadLbl.ForeColor = System.Drawing.Color.Silver;
+                this.downloadLbl.Text = "Downloading Updates";
+            }
         }
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             this.strtGameBtn.Enabled = true;
-            if (this.ServerStatus(this.Server))
+            if (initComplete)
             {
                 this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
                 this.downloadLbl.Text = "Mods are up to date";

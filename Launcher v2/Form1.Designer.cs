@@ -40,7 +40,8 @@ namespace Launcher_v2
             this.closeBtn = new System.Windows.Forms.Button();
             this.patchNotes = new System.Windows.Forms.WebBrowser();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.progressBar2 = new System.Windows.Forms.ProgressBar();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // progressBar1
@@ -127,7 +128,7 @@ namespace Launcher_v2
             this.patchNotes.Size = new System.Drawing.Size(900, 450);
             this.patchNotes.TabIndex = 5;
             this.patchNotes.TabStop = false;
-            this.patchNotes.Url = new System.Uri(Server + "/html/", System.UriKind.Absolute);
+            this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/", System.UriKind.Absolute);
             // 
             // panel1
             // 
@@ -139,15 +140,17 @@ namespace Launcher_v2
             this.panel1.TabIndex = 6;
             this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.titleBarPanel_Mousedown);
             // 
-            // progressBar2
+            // pictureBox1
             // 
-            this.progressBar2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(53)))), ((int)(((byte)(70)))));
-            this.progressBar2.ForeColor = System.Drawing.Color.DarkRed;
-            this.progressBar2.Location = new System.Drawing.Point(14, 416);
-            this.progressBar2.Name = "progressBar2";
-            this.progressBar2.Size = new System.Drawing.Size(710, 19);
-            this.progressBar2.Step = 1;
-            this.progressBar2.TabIndex = 7;
+            this.pictureBox1.BackColor = System.Drawing.Color.DodgerBlue;
+            this.pictureBox1.Location = new System.Drawing.Point(14, 416);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBox1.MaximumSize = new System.Drawing.Size(710, 19);
+            this.pictureBox1.MinimumSize = new System.Drawing.Size(0, 19);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(710, 19);
+            this.pictureBox1.TabIndex = 8;
+            this.pictureBox1.TabStop = false;
             // 
             // Form1
             // 
@@ -159,7 +162,7 @@ namespace Launcher_v2
             this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(900, 450);
             this.ControlBox = false;
-            this.Controls.Add(this.progressBar2);
+            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.minimizeBtn);
             this.Controls.Add(this.closeBtn);
@@ -174,6 +177,7 @@ namespace Launcher_v2
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "AAF Updater";
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -190,7 +194,7 @@ namespace Launcher_v2
         private System.Windows.Forms.Button minimizeBtn;
         private System.Windows.Forms.Panel panel1;
         internal System.Windows.Forms.WebBrowser patchNotes;
-        private System.Windows.Forms.ProgressBar progressBar2;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 
