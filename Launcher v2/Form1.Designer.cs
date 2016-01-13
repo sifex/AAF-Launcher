@@ -41,8 +41,10 @@ namespace Launcher_v2
             this.panel1 = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.SuspendLayout();
             // 
             // backgroundWorker1
@@ -74,7 +76,7 @@ namespace Launcher_v2
             this.downloadLbl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(17)))), ((int)(((byte)(17)))));
             this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(121)))), ((int)(((byte)(203)))));
             this.downloadLbl.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.downloadLbl.Location = new System.Drawing.Point(14, 380);
+            this.downloadLbl.Location = new System.Drawing.Point(46, 380);
             this.downloadLbl.Name = "downloadLbl";
             this.downloadLbl.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.downloadLbl.Size = new System.Drawing.Size(0, 13);
@@ -157,6 +159,17 @@ namespace Launcher_v2
             this.pictureBox2.TabIndex = 9;
             this.pictureBox2.TabStop = false;
             // 
+            // pictureBox3
+            // 
+            this.pictureBox3.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBox3.Image = global::Launcher_v2.Properties.Resources._723;
+            this.pictureBox3.Location = new System.Drawing.Point(14, 379);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(16, 16);
+            this.pictureBox3.TabIndex = 10;
+            this.pictureBox3.TabStop = false;
+            this.pictureBox3.
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -167,6 +180,7 @@ namespace Launcher_v2
             this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(900, 450);
             this.ControlBox = false;
+            this.Controls.Add(this.pictureBox3);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.panel1);
@@ -184,6 +198,7 @@ namespace Launcher_v2
             this.Text = "AAF Updater";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -200,6 +215,7 @@ namespace Launcher_v2
         internal System.Windows.Forms.WebBrowser patchNotes;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.PictureBox pictureBox3;
     }
 }
 

@@ -314,6 +314,8 @@ namespace Launcher_v2
         public void downloadLbl_Controller(double percentage, int type)
         {
             this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
+            this.pictureBox3.Visible = false;
+            this.downloadLbl.Location = new System.Drawing.Point(14, 380);
             if (type == 1)
             {
                 this.downloadLbl.Text = "Verifying Mods";
