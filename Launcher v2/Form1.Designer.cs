@@ -112,6 +112,8 @@ namespace Launcher_v2
             // 
             // patchNotes
             // 
+            this.patchNotes.AllowNavigation = false;
+            this.patchNotes.AllowWebBrowserDrop = false;
             this.patchNotes.CausesValidation = false;
             this.patchNotes.Location = new System.Drawing.Point(0, 0);
             this.patchNotes.MinimumSize = new System.Drawing.Size(20, 20);
@@ -121,6 +123,7 @@ namespace Launcher_v2
             this.patchNotes.TabIndex = 5;
             this.patchNotes.TabStop = false;
             this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/", System.UriKind.Absolute);
+            this.patchNotes.WebBrowserShortcutsEnabled = false;
             // 
             // panel1
             // 

@@ -22,7 +22,7 @@ namespace Launcher_v2
         // Set Server Variable. This should be where index.php, html and the mods folder should be.
         // Eg: http://exmaple.com/Arma3Updater/
         public string Server = "http://mods.australianarmedforces.org/";
-        public string Version = "0.3";
+        public string Version = "0.4";
         public bool initComplete = false;
 
         public const int WM_NCLBUTTONDOWN = 161;
@@ -316,7 +316,7 @@ namespace Launcher_v2
             this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
             if (type == 1)
             {
-                this.downloadLbl.Text = "Checking Mods";
+                this.downloadLbl.Text = "Verifying Mods";
             } else
             {
                 this.downloadLbl.Text = "Downloading Updates";
@@ -342,7 +342,7 @@ namespace Launcher_v2
                         {
                             stream2.Write(buffer, 0, count);
                             num += count;
-                            backgroundWorker1.ReportProgress((int)(percent/10 + (int)((double)num / (double)buffer.Length / fileList)));
+                            backgroundWorker1.ReportProgress((int)(percent * 710));
                         }
                         stream2.Close();
                     }
