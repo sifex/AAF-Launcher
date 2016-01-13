@@ -15,7 +15,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
-namespace Launcher_v2
+namespace AAF_Launcher
 {
     public partial class Form1 : Form
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Launcher_v2
+namespace AAF_Launcher
 {
     static class Program
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 
-namespace Launcher_v2
+namespace AAF_Launcher
 {
     public partial class Form1
     {
@@ -84,7 +84,7 @@ namespace Launcher_v2
             // minimizeBtn
             // 
             this.minimizeBtn.BackColor = System.Drawing.Color.Transparent;
-            this.minimizeBtn.BackgroundImage = global::Launcher_v2.Properties.Resources.minimize2;
+            this.minimizeBtn.BackgroundImage = Properties.Resources.minimize2;
             this.minimizeBtn.FlatAppearance.BorderSize = 0;
             this.minimizeBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.minimizeBtn.Location = new System.Drawing.Point(832, 0);
@@ -99,7 +99,7 @@ namespace Launcher_v2
             // closeBtn
             // 
             this.closeBtn.BackColor = System.Drawing.Color.Transparent;
-            this.closeBtn.BackgroundImage = global::Launcher_v2.Properties.Resources.close2;
+            this.closeBtn.BackgroundImage = Properties.Resources.close2;
             this.closeBtn.FlatAppearance.BorderSize = 0;
             this.closeBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.closeBtn.Location = new System.Drawing.Point(866, 0);
@@ -128,7 +128,7 @@ namespace Launcher_v2
             // 
             // panel1
             // 
-            this.panel1.BackgroundImage = global::Launcher_v2.Properties.Resources.bg;
+            this.panel1.BackgroundImage = Properties.Resources.bg;
             this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
