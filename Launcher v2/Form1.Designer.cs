@@ -41,6 +41,7 @@ namespace Launcher_v2
             this.panel1 = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.fileLbl = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
@@ -157,6 +158,18 @@ namespace Launcher_v2
             this.pictureBox2.TabIndex = 9;
             this.pictureBox2.TabStop = false;
             // 
+            // fileLbl
+            // 
+            this.fileLbl.AutoSize = true;
+            this.fileLbl.BackColor = System.Drawing.Color.Transparent;
+            this.fileLbl.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(74)))), ((int)(((byte)(105)))), ((int)(((byte)(136)))));
+            this.fileLbl.Location = new Point(this.downloadLbl.Location.X + this.downloadLbl.Size.Width + 10, 380);
+            this.fileLbl.Margin = new System.Windows.Forms.Padding(0);
+            this.fileLbl.Name = "fileLbl";
+            this.fileLbl.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.fileLbl.Size = new System.Drawing.Size(0, 13);
+            this.fileLbl.TabIndex = 10;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -167,6 +180,7 @@ namespace Launcher_v2
             this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(900, 450);
             this.ControlBox = false;
+            this.Controls.Add(this.fileLbl);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.panel1);
@@ -200,6 +214,7 @@ namespace Launcher_v2
         internal System.Windows.Forms.WebBrowser patchNotes;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.Label fileLbl;
     }
 }
 

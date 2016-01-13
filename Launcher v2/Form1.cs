@@ -22,8 +22,11 @@ namespace Launcher_v2
         // Set Server Variable. This should be where index.php, html and the mods folder should be.
         // Eg: http://exmaple.com/Arma3Updater/
         public string Server = "http://mods.australianarmedforces.org/";
-        public string Version = "0.4.1";
+        public string Version = "0.5";
         public int status = 1;
+        public string ModsDirName;
+        public string ModsRoot;
+        public string Root;
 
         public const int WM_NCLBUTTONDOWN = 161;
         public const int HT_CAPTION = 2;
@@ -37,7 +40,7 @@ namespace Launcher_v2
         public Form1()
         {
             checkVersion();
-            changeIEVersion();
+            changeIEVersion(11);
 
             status = 2;
 
@@ -55,6 +58,8 @@ namespace Launcher_v2
         {
             this.patchNotes.Refresh(WebBrowserRefreshOption.Completely);
             this.downloadLbl.Text = "Fetching Repo";
+            this.downloadLbl.BackColor = Color.Transparent;
+            this.fileLbl.BackColor = Color.Transparent;
         }
 
         public void checkVersion()
@@ -168,13 +173,13 @@ namespace Launcher_v2
             }
         }
 
-        private void changeIEVersion()
+        private void changeIEVersion(int version)
         {
             object regCheck = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Internet Explorer\\Main\\FeatureControl\\FEATURE_BROWSER_EMULATION", Process.GetCurrentProcess().ProcessName + ".exe", null);
             if (regCheck == null) 
             {
                 int RegVal;
-                int BrowserVer = 11;
+                int BrowserVer = version;
 
                 // Set the appropriate IE version
                 if (BrowserVer >= 11)
@@ -201,20 +206,21 @@ namespace Launcher_v2
 
             // Defining Root String (ARMA 3 Root Direcotry)
             // Eg. "c:/program files (x86)/steam/steamapps/common/Arma 3"
-            string Root = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3";
+            Root = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3";
             
             status = 8;
 
             // Loads Server Repos XML
-            XDocument xmlRepo = XDocument.Load(this.Server + "/repo.php?modAuth=24ERpTrR2LDH9xj2MZAwZMY2mkde");
+            XDocument xmlRepo = XDocument.Load(this.Server + "/repo.xml");
             
 
             // Fetches ModRoot Directory from Server, or Defaults to /Server_Mods/
             // Don't use /Mods/ as a folder as your clan will bug you to ask where their custom 1337 mods have gone! 
             // Eg. Root + /Mods_AAF/
-            string ModsRoot = Root + "/@Server_Mods/";
+            ModsRoot = Root + "/@Server_Mods/";
             foreach (XElement xelement in xmlRepo.Descendants((XName)"modDir"))
             {
+                ModsDirName = xelement.Element((XName)"name").Value;
                 ModsRoot = Root + "/" + xelement.Element((XName)"name").Value + "/";
             }
 
@@ -309,17 +315,17 @@ namespace Launcher_v2
                                 stream.Close();
                                 Form1.deleteFile(str3);
                                 this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
-                                this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0); }));
+                                this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
                             }
                             else
                             {
-                                this.Invoke(new Action(() => { downloadLbl_Controller(percent, 1); }));
+                                this.Invoke(new Action(() => { downloadLbl_Controller(percent, 1, str2); }));
                             }
                         }
                         else
                         {
                             this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
-                            this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0); }));
+                            this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
                         }
                     }
                 }
@@ -336,7 +342,7 @@ namespace Launcher_v2
             }
         }
 
-        public void downloadLbl_Controller(double percentage, int type)
+        public void downloadLbl_Controller(double percentage, int type, string currentFile)
         {
             this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
             this.downloadLbl.Location = new System.Drawing.Point(14, 380);
@@ -348,6 +354,9 @@ namespace Launcher_v2
                 this.downloadLbl.Text = "Downloading Updates";
             }
             this.downloadLbl.Text = this.downloadLbl.Text + " - " + (Math.Round((double)(percentage * 100),2).ToString()) + "%";
+            this.fileLbl.Text = "    " + @currentFile;
+            this.fileLbl.Location = new Point(this.downloadLbl.Location.X + this.downloadLbl.Size.Width, 380);
+            this.fileLbl.BackColor = Color.Transparent;
         }
 
         public void downloadFile(string sUrlToReadFileFrom, string sFilePathToWriteFileTo, double percent, int fileList)
@@ -385,6 +394,7 @@ namespace Launcher_v2
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             this.strtGameBtn.Enabled = true;
+            this.fileLbl.Text = "";
             switch (status)
             {
                 case 1:
@@ -401,7 +411,7 @@ namespace Launcher_v2
                     break;
                 case 4:
                     this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
-                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to create / rename mods directory.";
+                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to create / rename mods directory. Are you sure you don't have it open?";
                     break;
                 case 5:
                     this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
@@ -439,8 +449,18 @@ namespace Launcher_v2
         //Starts the game
         private void strtGameBtn_Click(object sender, EventArgs e)
         {
-            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/Arma3.exe", "-nosplash -skipIntro -mod=Mods_AAF/@aam;Mods_AAF/@ace3;Mods_AAF/@ares;Mods_AAF/@asr_ai3;Mods_AAF/@atlas_lhd;Mods_AAF/@cba_a3;Mods_AAF/@fa18x_black_wasp;Mods_AAF/@fallujah1_2;Mods_AAF/@js_jc_su35;Mods_AAF/@melb;Mods_AAF/@mrt_accfncs;Mods_AAF/@rhs_afrf;Mods_AAF/@rhs_usf;Mods_AAF/@st_gi;Mods_AAF/@sthud_a3;Mods_AAF/@sub_insurgents;Mods_AAF/@task_force_radio");
+            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/Arma3.exe", "-nosplash -skipIntro -mod=" + getModListForGameExec());
             this.Close();
+        }
+
+        private string getModListForGameExec()
+        {
+            string stringReturn = "";
+            foreach(string subdirectoryEntries in Directory.GetDirectories(ModsRoot))
+            {
+                stringReturn += ModsDirName + "/" + subdirectoryEntries.Replace(ModsRoot, "") + ";";
+            }
+            return stringReturn;
         }
     }
 }
