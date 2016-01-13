@@ -22,8 +22,8 @@ namespace Launcher_v2
         // Set Server Variable. This should be where index.php, html and the mods folder should be.
         // Eg: http://exmaple.com/Arma3Updater/
         public string Server = "http://mods.australianarmedforces.org/";
-        public string Version = "0.4";
-        public bool initComplete = false;
+        public string Version = "0.4.1";
+        public int status = 1;
 
         public const int WM_NCLBUTTONDOWN = 161;
         public const int HT_CAPTION = 2;
@@ -39,6 +39,8 @@ namespace Launcher_v2
             checkVersion();
             changeIEVersion();
 
+            status = 2;
+
             InitializeComponent();
             postStartup();
 
@@ -52,7 +54,6 @@ namespace Launcher_v2
         public void postStartup()
         {
             this.patchNotes.Refresh(WebBrowserRefreshOption.Completely);
-            this.downloadLbl.ForeColor = Color.Silver;
             this.downloadLbl.Text = "Fetching Repo";
         }
 
@@ -111,7 +112,7 @@ namespace Launcher_v2
             minimizeBtn.BackgroundImage = Properties.Resources.minimize2;
         }
 
-        //Delete File
+        // Delete File
         static bool deleteFile(string f)
         {
             try
@@ -132,11 +133,12 @@ namespace Launcher_v2
             {
                 stream.Seek(0L, SeekOrigin.Begin);
                 foreach (byte num in MD5.Create().ComputeHash((Stream)stream))
+                {
                     stringBuilder.Append(num.ToString("x2"));
+                }
                 stream.Seek(0L, SeekOrigin.Begin);
             }
             return stringBuilder.ToString();
-
         }
 
         static string generateHash(string input)
@@ -195,30 +197,42 @@ namespace Launcher_v2
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
+            status = 3;
 
             // Defining Root String (ARMA 3 Root Direcotry)
             // Eg. "c:/program files (x86)/steam/steamapps/common/Arma 3"
             string Root = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3";
-           
+            
+            status = 8;
+
             // Loads Server Repos XML
             XDocument xmlRepo = XDocument.Load(this.Server + "/repo.php?modAuth=24ERpTrR2LDH9xj2MZAwZMY2mkde");
             
+
             // Fetches ModRoot Directory from Server, or Defaults to /Server_Mods/
             // Don't use /Mods/ as a folder as your clan will bug you to ask where their custom 1337 mods have gone! 
             // Eg. Root + /Mods_AAF/
-            string ModsRoot = Root + "/Server_Mods/";
+            string ModsRoot = Root + "/@Server_Mods/";
             foreach (XElement xelement in xmlRepo.Descendants((XName)"modDir"))
             {
                 ModsRoot = Root + "/" + xelement.Element((XName)"name").Value + "/";
             }
 
+            status = 4;
+
             // Create Directory if it doesn't already exist (Creates ModRoot)
-            if (!Directory.Exists(ModsRoot))
+            if (Directory.Exists(ModsRoot.Replace("@", "")))
+            {
+                string from = ModsRoot.Replace(@"@", "");
+                string to = ModsRoot;
+                Directory.Move(from, to);
+            }
+            else if (!Directory.Exists(ModsRoot))
             {
                 Directory.CreateDirectory(ModsRoot);
             }
 
-            initComplete = true;
+            status = 5;
 
             /////////////////////////////////////////////////////////////////////////////////
             // Deletes all Directories other than ones that exist in the Server Repos List //
@@ -242,6 +256,8 @@ namespace Launcher_v2
                 Directory.Delete(dir, true);
             }
 
+            status = 6;
+
             ///////////////////////////////////////////////////////////////////////////
             // Deletes all Files other than ones that exist in the Server Repos List //
             ///////////////////////////////////////////////////////////////////////////
@@ -264,6 +280,7 @@ namespace Launcher_v2
                 System.IO.File.Delete(file);
             }
 
+            status = 7;
 
             int filesDone = 0;
             int fileList = xmlRepo.Descendants("file").Count();
@@ -309,12 +326,19 @@ namespace Launcher_v2
                 filesDone++;
                 backgroundWorker1.ReportProgress((int)(percent*710));
             }
+            if(filesDone == fileList)
+            {
+                status = 10;
+            }
+            else
+            {
+                status = 9;
+            }
         }
 
         public void downloadLbl_Controller(double percentage, int type)
         {
             this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
-            this.pictureBox3.Visible = false;
             this.downloadLbl.Location = new System.Drawing.Point(14, 380);
             if (type == 1)
             {
@@ -361,17 +385,54 @@ namespace Launcher_v2
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             this.strtGameBtn.Enabled = true;
-            if (initComplete)
+            switch (status)
             {
-                this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(100, 206, 63);
-                this.downloadLbl.Text = "Mods are up to date";
-                this.pictureBox1.Size = new Size(710, 31);
-                this.pictureBox1.BackColor = System.Drawing.Color.FromArgb(100, 206, 63);
-            }
-            else
-            {
-                this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
-                this.downloadLbl.Text = "Cannot connect to update server";
+                case 1:
+                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
+                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Unknown Error Occurred. Please contact Server Admin.";
+                    break;
+                case 2:
+                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
+                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Check Version or IEChangeVersion Error.";
+                    break;
+                case 3:
+                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
+                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to find Arma 3 Root Directory.";
+                    break;
+                case 4:
+                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
+                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to create / rename mods directory.";
+                    break;
+                case 5:
+                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
+                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to remove extra existing folders.";
+                    break;
+                case 6:
+                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
+                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to remove extra existing files.";
+                    break;
+                case 7:
+                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
+                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to successfully download mods.";
+                    break;
+                case 8:
+                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
+                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Cannot connect to update server";
+                    break;
+                case 9:
+                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
+                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Files Processed does not equal Files Retrieved. Please contact Server Admin.";
+                    break;
+                case 10:
+                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(100, 206, 63);
+                    this.downloadLbl.Text = "Mods are up to date. Ready to Launch.";
+                    this.pictureBox1.Size = new Size(710, 31);
+                    this.pictureBox1.BackColor = System.Drawing.Color.FromArgb(100, 206, 63);
+                    break;
+                default:
+                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
+                    this.downloadLbl.Text = "Unknown Error - Code: " + status;
+                    break;
             }
         }
 

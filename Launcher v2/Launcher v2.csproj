@@ -103,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico" />
+    <None Include="Resources\export.gif" />
     <None Include="Resources\723.GIF" />
     <Content Include="Resources\aaf.ico" />
     <Content Include="Resources\bg.png" />
