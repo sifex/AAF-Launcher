@@ -1,61 +1,90 @@
-<?php
+<?php 
 	
-	$modDir = "./Mods_AAF";
-
-	function getDirMap($dir) {
-		$root = $dir;
-
-		$iter = new RecursiveIteratorIterator(
-		    new RecursiveDirectoryIterator($root, RecursiveDirectoryIterator::SKIP_DOTS),
-		    RecursiveIteratorIterator::SELF_FIRST,
-		    RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
-		);
-
-		$paths = array($root);
-		foreach ($iter as $path => $dir) {
-		    if ($dir->isDir()) {
-		        $paths[] = $path;
-		    }
-		}
-
-		return ($paths);
-	}
-
-	function getEntireDirMap($dir) {
-		$return = array();
-		foreach(getDirMap($dir) as $folder) {
-			$scanned_directory = array_diff(scandir($folder), array('..', '.', '.DS_Store'));
-			foreach($scanned_directory as $file) {
-				$return[substr(($folder . "/" . $file), 1)] = (md5_file($folder . "/" . $file));
-			}
-		}
-		return ( $return );
-	}
-
-	function generateUpdates($dir) {
-		$xml ='';
-		$xml .= '<theupdates>';
-		$xml .= '<modDir><name>' . substr($dir,2) . '</name></modDir>';
-		foreach(getEntireDirMap($dir) as $key => $comb) {
-			if(!strpos($key,'.')) {
-				$xml .= '<directory><name>' . $key . '</name></directory>';
-			} else {
-				$xml .= '<file><name>' . $key . '</name><hash>' . $comb . '</hash></file>';
-			}
-		}
-		$xml .=  '</theupdates>';
-		return $xml;
-	}
-
-	function formatXML($xml) {
-		header("Content-type: text/xml");
-		$dom = new DOMDocument;
-		$dom->preserveWhiteSpace = FALSE;
-		$dom->loadXML($xml);
-		$dom->formatOutput = TRUE;
-		return $dom->saveXml();
+	$version = file_get_contents('version.txt');
+	$disabled;
+	$downloadURL = false;
+	$callout;
+	
+	
+	if(!glob("release/" . $version . "/*.zip")){
+	    $disabled = true;
+		$callout = '<span class="alert label">The current version is still under development. The download has been disabled at this time.</span><br /><br /><br />';
+	} else {
+		$downloadURL =  "/release/latest/";
 	}
 	
-	echo formatXML(generateUpdates($modDir));
+	if(isset($_GET['update'])) {
+		$callout = '<span class="alert label">You do not have an up to date version of the Mod Updater. Please download the updated version below.</span><br /><br /><br />';
+	}
+	
+	?>
 
-?>
+
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AAF Updater</title>
+<link rel="stylesheet" href="http://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
+<style>
+.logo {
+	background: url('http://i.imgur.com/iSdnxvR.png');
+	background-size: 470px 194px; 
+	height: 194px; 
+	width: 470px;
+	display: inline-block;
+	margin-top: -50px;
+}
+h2 {
+	margin-top: -30px;
+}
+</style>
+</head>
+<body>
+ 
+<div class="top-bar">
+<div class="top-bar-left">
+<ul class="menu">
+<li class="menu-text">AAF Updater</li>
+</ul>
+</div>
+<div class="top-bar-right">
+<ul class="menu"><!--
+<li><a href="#">Three</a></li>
+<li><a href="#">Four</a></li>
+<li><a href="#">Five</a></li>
+<li><a href="#">Six</a></li> -->
+</ul>
+</div>
+</div>
+ 
+<div class="callout large">
+<div class="row column text-center">
+<?php echo $callout; ?>
+<!-- <div class="logo"></div> -->
+<h1>AAF Launcher</h1>
+<h2><small>Changing the ARMA Modding World Forever.</small></h2>
+<p class="lead">Download and start updating right away! <a href="https://media.giphy.com/media/wErJXg1tIgHXG/giphy.gif">Just do it!</a></p>
+<a href="<?php echo ($downloadURL ? $downloadURL : '#'); ?>" class="button large <?php echo ($disabled ? 'disabled' : ''); ?>">Download Now</a>
+<a href="#" class="button large hollow radius">Donate</a>
+<div>
+	<small>Current Version: <?php echo $version; ?></small>
+</div>
+</div>
+</div><div class="row column text-right">
+<ul class="menu"><!-- 
+<li><a href="#">One</a></li>
+<li><a href="#">Two</a></li>
+<li><a href="#">Three</a></li>
+<li><a href="#">Four</a></li> -->
+</ul>
+<small>Copyright &copy; 2016 Alex Sinnott</small>
+</div>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="http://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
+<script>
+      $(document).foundation();
+    </script>
+</body>
+</html>
