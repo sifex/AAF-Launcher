@@ -14,6 +14,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using System.Xaml;
+using System.Windows;
 
 namespace AAF_Launcher
 {
@@ -22,7 +24,7 @@ namespace AAF_Launcher
         // Set Server Variable. This should be where index.php, html and the mods folder should be.
         // Eg: http://exmaple.com/Arma3Updater/
         public string Server = "http://mods.australianarmedforces.org/";
-        public string Version = "0.5";
+        public string Version = "0.5.1.1";
         public int status = 1;
         public string ModsDirName;
         public string ModsRoot;
@@ -69,7 +71,7 @@ namespace AAF_Launcher
 
             if(versionNo != Version)
             {
-                MessageBox.Show("This version is out of date, please download the updated version.");
+                System.Windows.Forms.MessageBox.Show("This version is out of date, please download the updated version.");
                 Process.Start("http://mods.australianarmedforces.org/?update");
                 Environment.Exit(0);
             }
@@ -202,18 +204,26 @@ namespace AAF_Launcher
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-            status = 3;
 
             // Defining Root String (ARMA 3 Root Direcotry)
             // Eg. "c:/program files (x86)/steam/steamapps/common/Arma 3"
-            Root = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3";
+            Root = (string)Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath",null);
+
+            if(Root == null)
+            {
+                status = 3;
+                return;
+            }
+            else
+            {
+                Root =  Root + "/steamapps/common/Arma 3";
+            }
             
             status = 8;
 
             // Loads Server Repos XML
             XDocument xmlRepo = XDocument.Load(this.Server + "/repo.xml");
             
-
             // Fetches ModRoot Directory from Server, or Defaults to /Server_Mods/
             // Don't use /Mods/ as a folder as your clan will bug you to ask where their custom 1337 mods have gone! 
             // Eg. Root + /Mods_AAF/
@@ -355,7 +365,7 @@ namespace AAF_Launcher
             }
             this.downloadLbl.Text = this.downloadLbl.Text + " - " + (Math.Round((double)(percentage * 100),2).ToString()) + "%";
             this.fileLbl.Text = "    " + @currentFile;
-            this.fileLbl.Location = new Point(this.downloadLbl.Location.X + this.downloadLbl.Size.Width, 380);
+            this.fileLbl.Location = new System.Drawing.Point(this.downloadLbl.Location.X + this.downloadLbl.Size.Width, 380);
             this.fileLbl.BackColor = Color.Transparent;
         }
 
@@ -388,7 +398,7 @@ namespace AAF_Launcher
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            this.pictureBox1.Size = new Size(e.ProgressPercentage, 31);
+            this.pictureBox1.Size = new System.Drawing.Size(e.ProgressPercentage, 31);
         }
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -436,7 +446,7 @@ namespace AAF_Launcher
                 case 10:
                     this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(100, 206, 63);
                     this.downloadLbl.Text = "Mods are up to date. Ready to Launch.";
-                    this.pictureBox1.Size = new Size(710, 31);
+                    this.pictureBox1.Size = new System.Drawing.Size(710, 31);
                     this.pictureBox1.BackColor = System.Drawing.Color.FromArgb(100, 206, 63);
                     break;
                 default:
