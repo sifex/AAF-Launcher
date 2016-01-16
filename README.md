@@ -12,7 +12,7 @@ Changing the ARMA Modding World Forever.
 * Error Code: 7 - Failed to successfully download mods.
 * Error Code: 8 - Cannot connect to update server
 * Error Code: 9 - Files Processed does not equal Files Retrieved. Please contact Server Admin.
-* Error Code: 9 - Unknown Error - Code: + status;
+* Error Code: Default - Unknown Error - Code: + status;
 * Mods are up to date. Ready to Launch.
 
 
