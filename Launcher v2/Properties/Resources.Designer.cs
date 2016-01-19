@@ -103,6 +103,16 @@ namespace AAF_Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ic_settings_48px_128 {
+            get {
+                object obj = ResourceManager.GetObject("ic_settings_48px_128", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap minimize1 {
             get {
                 object obj = ResourceManager.GetObject("minimize1", resourceCulture);

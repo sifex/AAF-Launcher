@@ -67,7 +67,6 @@ namespace AAF_Launcher
             this.strtGameBtn.TabIndex = 1;
             this.strtGameBtn.Text = "START GAME";
             this.strtGameBtn.UseVisualStyleBackColor = false;
-            this.strtGameBtn.Click += new System.EventHandler(this.strtGameBtn_Click);
             // 
             // downloadLbl
             // 
@@ -84,7 +83,7 @@ namespace AAF_Launcher
             // minimizeBtn
             // 
             this.minimizeBtn.BackColor = System.Drawing.Color.Transparent;
-            this.minimizeBtn.BackgroundImage = Properties.Resources.minimize2;
+            this.minimizeBtn.BackgroundImage = global::AAF_Launcher.Properties.Resources.minimize2;
             this.minimizeBtn.FlatAppearance.BorderSize = 0;
             this.minimizeBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.minimizeBtn.Location = new System.Drawing.Point(832, 0);
@@ -99,7 +98,7 @@ namespace AAF_Launcher
             // closeBtn
             // 
             this.closeBtn.BackColor = System.Drawing.Color.Transparent;
-            this.closeBtn.BackgroundImage = Properties.Resources.close2;
+            this.closeBtn.BackgroundImage = global::AAF_Launcher.Properties.Resources.close2;
             this.closeBtn.FlatAppearance.BorderSize = 0;
             this.closeBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.closeBtn.Location = new System.Drawing.Point(866, 0);
@@ -113,7 +112,6 @@ namespace AAF_Launcher
             // 
             // patchNotes
             // 
-            this.patchNotes.AllowNavigation = false;
             this.patchNotes.AllowWebBrowserDrop = false;
             this.patchNotes.CausesValidation = false;
             this.patchNotes.Location = new System.Drawing.Point(0, 0);
@@ -125,10 +123,11 @@ namespace AAF_Launcher
             this.patchNotes.TabStop = false;
             this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/", System.UriKind.Absolute);
             this.patchNotes.WebBrowserShortcutsEnabled = false;
+            this.patchNotes.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this.webBrowser1_Navigating);
             // 
             // panel1
             // 
-            this.panel1.BackgroundImage = Properties.Resources.bg;
+            this.panel1.BackgroundImage = global::AAF_Launcher.Properties.Resources.bg;
             this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
@@ -163,7 +162,7 @@ namespace AAF_Launcher
             this.fileLbl.AutoSize = true;
             this.fileLbl.BackColor = System.Drawing.Color.Transparent;
             this.fileLbl.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(74)))), ((int)(((byte)(105)))), ((int)(((byte)(136)))));
-            this.fileLbl.Location = new Point(this.downloadLbl.Location.X + this.downloadLbl.Size.Width + 10, 380);
+            this.fileLbl.Location = new System.Drawing.Point(14, 380);
             this.fileLbl.Margin = new System.Windows.Forms.Padding(0);
             this.fileLbl.Name = "fileLbl";
             this.fileLbl.RightToLeft = System.Windows.Forms.RightToLeft.No;

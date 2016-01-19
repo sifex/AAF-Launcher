@@ -24,7 +24,7 @@ namespace AAF_Launcher
         // Set Server Variable. This should be where index.php, html and the mods folder should be.
         // Eg: http://exmaple.com/Arma3Updater/
         public string Server = "http://mods.australianarmedforces.org/";
-        public string Version = "0.5.1.1";
+        public string Version = "0.5.2.1";
         public int status = 1;
         public string ModsDirName;
         public string ModsRoot;
@@ -50,18 +50,27 @@ namespace AAF_Launcher
             postStartup();
 
             // Download progress
-            backgroundWorker1.RunWorkerAsync();
 
             // Disable Start Game Button for now
-            strtGameBtn.Enabled = false;
+            // strtGameBtn.Enabled = false;
+
+            this.strtGameBtn.Text = "Begin Update";
+            this.strtGameBtn.Click += new System.EventHandler(this.update_Click);
         }
 
         public void postStartup()
         {
             this.patchNotes.Refresh(WebBrowserRefreshOption.Completely);
+        }
+
+        public void update_Click(object sender, EventArgs e)
+        {
+            backgroundWorker1.RunWorkerAsync();
             this.downloadLbl.Text = "Fetching Repo";
             this.downloadLbl.BackColor = Color.Transparent;
             this.fileLbl.BackColor = Color.Transparent;
+
+            this.strtGameBtn.Enabled = false;
         }
 
         public void checkVersion()
@@ -75,6 +84,15 @@ namespace AAF_Launcher
                 Process.Start("http://mods.australianarmedforces.org/?update");
                 Environment.Exit(0);
             }
+        }
+
+        public void webBrowser1_Navigating(object sender, WebBrowserNavigatingEventArgs e)
+        {
+            //cancel the current event
+            e.Cancel = true;
+
+            //this opens the URL in the user's default browser
+            Process.Start(e.Url.ToString());
         }
 
         // Makes the main window (Form1) dragable
@@ -117,6 +135,13 @@ namespace AAF_Launcher
         private void minimizeBtn_MouseLeave(object sender, EventArgs e)
         {
             minimizeBtn.BackgroundImage = Properties.Resources.minimize2;
+        }
+
+        // Settings Button
+        private void settingsBtn_Click(object sender, EventArgs e)
+        {
+            SettingsForm objUI = new SettingsForm();
+            objUI.ShowDialog();
         }
 
         // Delete File
@@ -218,7 +243,13 @@ namespace AAF_Launcher
             {
                 Root =  Root + "/steamapps/common/Arma 3";
             }
-            
+
+            if (!Directory.Exists(Root))
+            {
+                status = 11;
+                return;
+            }
+
             status = 8;
 
             // Loads Server Repos XML
@@ -237,13 +268,7 @@ namespace AAF_Launcher
             status = 4;
 
             // Create Directory if it doesn't already exist (Creates ModRoot)
-            if (Directory.Exists(ModsRoot.Replace("@", "")))
-            {
-                string from = ModsRoot.Replace(@"@", "");
-                string to = ModsRoot;
-                Directory.Move(from, to);
-            }
-            else if (!Directory.Exists(ModsRoot))
+             if (!Directory.Exists(ModsRoot))
             {
                 Directory.CreateDirectory(ModsRoot);
             }
@@ -345,6 +370,10 @@ namespace AAF_Launcher
             if(filesDone == fileList)
             {
                 status = 10;
+
+                this.strtGameBtn.Text = "Launch";
+                this.strtGameBtn.Click -= new System.EventHandler(this.update_Click);
+                this.strtGameBtn.Click += new System.EventHandler(this.strtGameBtn_Click);
             }
             else
             {
@@ -421,7 +450,7 @@ namespace AAF_Launcher
                     break;
                 case 4:
                     this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
-                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to create / rename mods directory. Are you sure you don't have it open?";
+                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to create " + ModsDirName + " directory. Are you sure you don't have it open?";
                     break;
                 case 5:
                     this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
@@ -443,6 +472,10 @@ namespace AAF_Launcher
                     this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
                     this.downloadLbl.Text = "Error Code: " + status + " - " + "Files Processed does not equal Files Retrieved. Please contact Server Admin.";
                     break;
+                case 11:
+                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
+                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to find ARMA 3 Directory. Looking for " + Root;
+                    break;
                 case 10:
                     this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(100, 206, 63);
                     this.downloadLbl.Text = "Mods are up to date. Ready to Launch.";
@@ -459,7 +492,7 @@ namespace AAF_Launcher
         //Starts the game
         private void strtGameBtn_Click(object sender, EventArgs e)
         {
-            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/Arma3.exe", "-nosplash -skipIntro -mod=" + getModListForGameExec());
+            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/arma3launcher.exe", "-nosplash -skipIntro -mod=" + getModListForGameExec());
             this.Close();
         }
 
