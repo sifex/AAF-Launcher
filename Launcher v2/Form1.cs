@@ -24,7 +24,7 @@ namespace AAF_Launcher
         // Set Server Variable. This should be where index.php, html and the mods folder should be.
         // Eg: http://exmaple.com/Arma3Updater/
         public string Server = "http://mods.australianarmedforces.org/";
-        public string Version = "0.5.2.1";
+        public string Version = "0.5.2.2";
         public int status = 1;
         public string ModsDirName;
         public string ModsRoot;
