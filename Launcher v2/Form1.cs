@@ -29,6 +29,10 @@ namespace AAF_Launcher
         public string ModsDirName;
         public string ModsRoot;
         public string Root;
+        public string Username;
+
+        public string key;
+        public string installDirectory;
 
         public const int WM_NCLBUTTONDOWN = 161;
         public const int HT_CAPTION = 2;
@@ -39,8 +43,10 @@ namespace AAF_Launcher
         [DllImportAttribute("user32.dll")]
         public static extern bool ReleaseCapture();
 
-        public Form1()
+        public Form1(string key)
         {
+            this.key = key;
+            this.installDirectory = fetchInstall(key);
             checkVersion();
             changeIEVersion(11);
 
@@ -60,7 +66,18 @@ namespace AAF_Launcher
 
         public void postStartup()
         {
+            var UsernameURL = @"http://10.0.0.3/api/user/info/" + key + "/username/";
+            Username = (new WebClient()).DownloadString(UsernameURL);
+
             this.patchNotes.Refresh(WebBrowserRefreshOption.Completely);
+            this.downloadLbl.Text = "Hi " + FirstCharToUpper(Username) + ". Current Install Directory is: " + installDirectory;
+        }
+
+        public static string FirstCharToUpper(string input)
+        {
+            if (String.IsNullOrEmpty(input))
+                throw new ArgumentException("ARGH!");
+            return input.First().ToString().ToUpper() + input.Substring(1);
         }
 
         public void update_Click(object sender, EventArgs e)
@@ -71,6 +88,12 @@ namespace AAF_Launcher
             this.fileLbl.BackColor = Color.Transparent;
 
             this.strtGameBtn.Enabled = false;
+        }
+
+        public string fetchInstall(string key)
+        {
+            var installURL = @"http://10.0.0.3/api/user/install/" + key;
+            return (new WebClient()).DownloadString(installURL);
         }
 
         public void checkVersion()
@@ -108,7 +131,7 @@ namespace AAF_Launcher
         // Close Button
         private void closeBtn_Click(object sender, EventArgs e)
         {
-            this.Close();
+            System.Windows.Forms.Application.Exit();
         }
 
         private void closeBtn_MouseEnter(object sender, EventArgs e)
@@ -136,14 +159,7 @@ namespace AAF_Launcher
         {
             minimizeBtn.BackgroundImage = Properties.Resources.minimize2;
         }
-
-        // Settings Button
-        private void settingsBtn_Click(object sender, EventArgs e)
-        {
-            SettingsForm objUI = new SettingsForm();
-            objUI.ShowDialog();
-        }
-
+        
         // Delete File
         static bool deleteFile(string f)
         {
@@ -235,7 +251,7 @@ namespace AAF_Launcher
 
             // Defining Root String (ARMA 3 Root Direcotry)
             // Eg. "c:/program files (x86)/steam/steamapps/common/Arma 3"
-            Root = (string)Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath",null);
+            /* Root = (string)Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath",null);
 
             if(Root == null)
             {
@@ -245,7 +261,9 @@ namespace AAF_Launcher
             else
             {
                 Root =  Root + "/steamapps/common/Arma 3";
-            }
+            } */
+
+            Root = this.installDirectory.Replace(@"\", @"/");
 
             if (!Directory.Exists(Root))
             {
@@ -281,7 +299,7 @@ namespace AAF_Launcher
             /////////////////////////////////////////////////////////////////////////////////
             // Deletes all Directories other than ones that exist in the Server Repos List //
             /////////////////////////////////////////////////////////////////////////////////
-
+            
             // Fetches all Dirs from XML
             List<string> dbDirs = new List<string>();
             foreach (XElement dir in xmlRepo.Descendants((XName)"directory"))
@@ -297,6 +315,7 @@ namespace AAF_Launcher
             // Delete the difference
             foreach (string dir in Enumerable.Except<string>((IEnumerable<string>)allDirs, (IEnumerable<string>)dbDirs, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase))
             {
+                System.Windows.Forms.MessageBox.Show("Deleting " + dir);
                 Directory.Delete(dir, true);
             }
 
@@ -321,6 +340,7 @@ namespace AAF_Launcher
             // Delete the difference
             foreach (string file in Enumerable.Except<string>((IEnumerable<string>)allFiles, (IEnumerable<string>)dbFiles, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase))
             {
+                System.Windows.Forms.MessageBox.Show("Deleting " + file);
                 System.IO.File.Delete(file);
             }
 
@@ -507,6 +527,13 @@ namespace AAF_Launcher
                 stringReturn += ModsDirName + "/" + subdirectoryEntries.Replace(ModsRoot, "") + ";";
             }
             return stringReturn;
+        }
+
+        private void pictureBox3_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            var Form1 = new KeyForm(true);
+            Form1.Show();
         }
     }
 }
