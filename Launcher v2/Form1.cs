@@ -25,7 +25,7 @@ namespace AAF_Launcher
         // Eg: http://exmaple.com/Arma3Updater/
         public string Server = "http://mods.australianarmedforces.org/";
         public string ScarletAPI = "http://scarlet.australianarmedforces.org/";
-        public string Version = "0.5.2.2";
+        public string Version = "0.6";
         public int status = 1;
         public string ModsDirName;
         public string ModsRoot;
@@ -55,6 +55,7 @@ namespace AAF_Launcher
 
             status = 2;
 
+            // UI Initialize
             InitializeComponent();
             postStartup();
 
@@ -69,10 +70,15 @@ namespace AAF_Launcher
 
         public void postStartup()
         {
+            // Set Username
             Username = API.Request("user", "info", key, "username");
 
             this.patchNotes.Refresh(WebBrowserRefreshOption.Completely);
-            this.downloadLbl.Text = "Hi " + FirstCharToUpper(Username) + ". Current Install Directory is: " + installDirectory;
+            this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
+            this.downloadLbl.Text = "Hi " + FirstCharToUpper(Username) + ".";
+            this.fileLbl.Text = "Current Install Directory is: " + installDirectory;
+            this.fileLbl.Location = new System.Drawing.Point(this.downloadLbl.Location.X + this.downloadLbl.Size.Width, 380);
+            this.fileLbl.BackColor = Color.Transparent;
         }
 
         public static string FirstCharToUpper(string input)
@@ -92,6 +98,7 @@ namespace AAF_Launcher
             backgroundWorker1.RunWorkerAsync();
             this.downloadLbl.Text = "Fetching Repo";
             this.downloadLbl.BackColor = Color.Transparent;
+            this.fileLbl.Text = "";
             this.fileLbl.BackColor = Color.Transparent;
 
             this.strtGameBtn.Enabled = false;
