@@ -21,24 +21,31 @@ namespace AAF_Launcher
         {
             this.APIUserkey = key;
             InitializeComponent();
-            
-            var installURL = @"http://10.0.0.3/api/user/install/" + key;
-            string installDir = (new WebClient()).DownloadString(installURL);
 
-            // Defining Root String (ARMA 3 Root Direcotry)
-            // Eg. "c:/program files (x86)/steam/steamapps/common/Arma 3"
-            String Root = (string)Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath",null);
+            string installDir = API.Request("user", "install", key);
 
-            if(Root == null)
+            if(installDir == "")
             {
-                return;
+                // Defining Root String (ARMA 3 Root Direcotry)
+                // Eg. "c:/program files (x86)/steam/steamapps/common/Arma 3"
+                String Root = (string)Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", null);
+
+                if (Root == null)
+                {
+                    return;
+                }
+                else
+                {
+                    Root = Root + "/steamapps/common/Arma 3";
+                }
+
+                textBox1.Text = Root;
             }
             else
             {
-                Root =  Root + "/steamapps/common/Arma 3";
+                textBox1.Text = installDir;
             }
-
-            textBox1.Text = Root;
+           
         }
 
         public static byte[] Post(string uri, NameValueCollection pairs)
@@ -71,7 +78,7 @@ namespace AAF_Launcher
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             DialogResult result = fbd.ShowDialog();
             
-            textBox1.Text = fbd.SelectedPath + @"\@Mods_AAF";
+            textBox1.Text = fbd.SelectedPath;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -79,7 +86,7 @@ namespace AAF_Launcher
             NameValueCollection postData = new NameValueCollection();
             postData.Add("installDir", textBox1.Text);
 
-            Post("http://10.0.0.3/api/user/install/" + APIUserkey + "/", postData);
+            API.PostRequest("user","install", APIUserkey, "", postData);
 
             this.Hide();
             var myForm = new Form1(APIUserkey);

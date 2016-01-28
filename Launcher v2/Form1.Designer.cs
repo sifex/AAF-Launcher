@@ -33,6 +33,7 @@ namespace AAF_Launcher
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.backgroundWorker1.WorkerSupportsCancellation = true;
             this.strtGameBtn = new System.Windows.Forms.Button();
             this.downloadLbl = new System.Windows.Forms.Label();
             this.minimizeBtn = new System.Windows.Forms.Button();
@@ -58,6 +59,7 @@ namespace AAF_Launcher
             // strtGameBtn
             // 
             this.strtGameBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(13)))), ((int)(((byte)(21)))));
+            this.strtGameBtn.Cursor = System.Windows.Forms.Cursors.Hand;
             this.strtGameBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(121)))), ((int)(((byte)(203)))));
             this.strtGameBtn.FlatAppearance.BorderSize = 2;
             this.strtGameBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -174,6 +176,7 @@ namespace AAF_Launcher
             // pictureBox3
             // 
             this.pictureBox3.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBox3.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBox3.Image = global::AAF_Launcher.Properties.Resources.ic_settings_48px_128;
             this.pictureBox3.Location = new System.Drawing.Point(854, 105);
             this.pictureBox3.Name = "pictureBox3";

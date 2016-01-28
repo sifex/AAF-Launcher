@@ -35,10 +35,43 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
             button1 = new System.Windows.Forms.Button();
             button2 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
+            // 
+            // button1
+            // 
+            button1.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            button1.Cursor = System.Windows.Forms.Cursors.Hand;
+            button1.FlatAppearance.BorderSize = 0;
+            button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            button1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            button1.Location = new System.Drawing.Point(94, 175);
+            button1.Margin = new System.Windows.Forms.Padding(0);
+            button1.Name = "button1";
+            button1.Size = new System.Drawing.Size(85, 26);
+            button1.TabIndex = 10;
+            button1.Text = "Enter";
+            button1.UseVisualStyleBackColor = false;
+            button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // button2
+            // 
+            button2.BackColor = System.Drawing.Color.IndianRed;
+            button2.FlatAppearance.BorderSize = 0;
+            button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            button2.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            button2.Location = new System.Drawing.Point(468, 148);
+            button2.Margin = new System.Windows.Forms.Padding(0);
+            button2.Name = "button2";
+            button2.Size = new System.Drawing.Size(38, 22);
+            button2.TabIndex = 12;
+            button2.Text = "...";
+            button2.UseVisualStyleBackColor = false;
+            button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // closeBtn
             // 
@@ -66,28 +99,13 @@
             this.pictureBox1.TabIndex = 6;
             this.pictureBox1.TabStop = false;
             // 
-            // button1
-            // 
-            button1.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            button1.FlatAppearance.BorderSize = 0;
-            button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            button1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            button1.Location = new System.Drawing.Point(114, 179);
-            button1.Margin = new System.Windows.Forms.Padding(0);
-            button1.Name = "button1";
-            button1.Size = new System.Drawing.Size(85, 26);
-            button1.TabIndex = 10;
-            button1.Text = "Enter";
-            button1.UseVisualStyleBackColor = false;
-            button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(111, 122);
+            this.label1.Location = new System.Drawing.Point(91, 123);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(105, 17);
             this.label1.TabIndex = 9;
@@ -95,27 +113,32 @@
             // 
             // textBox1
             // 
+            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.Location = new System.Drawing.Point(114, 147);
-            this.textBox1.MinimumSize = new System.Drawing.Size(0, 22);
+            this.textBox1.Location = new System.Drawing.Point(100, 152);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(335, 22);
+            this.textBox1.Size = new System.Drawing.Size(361, 13);
             this.textBox1.TabIndex = 8;
             // 
-            // button2
+            // label2
             // 
-            button2.BackColor = System.Drawing.Color.Firebrick;
-            button2.FlatAppearance.BorderSize = 0;
-            button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            button2.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            button2.Location = new System.Drawing.Point(448, 147);
-            button2.Margin = new System.Windows.Forms.Padding(0);
-            button2.Name = "button2";
-            button2.Size = new System.Drawing.Size(38, 22);
-            button2.TabIndex = 12;
-            button2.Text = "...";
-            button2.UseVisualStyleBackColor = false;
-            button2.Click += new System.EventHandler(this.button2_Click);
+            this.label2.AutoSize = true;
+            this.label2.BackColor = System.Drawing.Color.Transparent;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.ForeColor = System.Drawing.Color.IndianRed;
+            this.label2.Location = new System.Drawing.Point(194, 123);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(120, 17);
+            this.label2.TabIndex = 13;
+            this.label2.Text = "ARMA 3 Directory";
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.Color.White;
+            this.panel1.Location = new System.Drawing.Point(94, 148);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(371, 22);
+            this.panel1.TabIndex = 14;
             // 
             // InstallForm
             // 
@@ -124,10 +147,12 @@
             this.BackgroundImage = global::AAF_Launcher.Properties.Resources.home_bg;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(609, 301);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.label2);
             this.Controls.Add(button2);
             this.Controls.Add(button1);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.closeBtn);
             this.Controls.Add(this.pictureBox1);
             this.DoubleBuffered = true;
@@ -148,5 +173,7 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Panel panel1;
     }
 }

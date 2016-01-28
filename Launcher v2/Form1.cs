@@ -24,6 +24,7 @@ namespace AAF_Launcher
         // Set Server Variable. This should be where index.php, html and the mods folder should be.
         // Eg: http://exmaple.com/Arma3Updater/
         public string Server = "http://mods.australianarmedforces.org/";
+        public string ScarletAPI = "http://scarlet.australianarmedforces.org/";
         public string Version = "0.5.2.2";
         public int status = 1;
         public string ModsDirName;
@@ -42,6 +43,8 @@ namespace AAF_Launcher
                          int Msg, int wParam, int lParam);
         [DllImportAttribute("user32.dll")]
         public static extern bool ReleaseCapture();
+
+        public bool WorkerSupportsCancellation = true;
 
         public Form1(string key)
         {
@@ -66,8 +69,7 @@ namespace AAF_Launcher
 
         public void postStartup()
         {
-            var UsernameURL = @"http://10.0.0.3/api/user/info/" + key + "/username/";
-            Username = (new WebClient()).DownloadString(UsernameURL);
+            Username = API.Request("user", "info", key, "username");
 
             this.patchNotes.Refresh(WebBrowserRefreshOption.Completely);
             this.downloadLbl.Text = "Hi " + FirstCharToUpper(Username) + ". Current Install Directory is: " + installDirectory;
@@ -76,8 +78,13 @@ namespace AAF_Launcher
         public static string FirstCharToUpper(string input)
         {
             if (String.IsNullOrEmpty(input))
+            {
                 throw new ArgumentException("ARGH!");
-            return input.First().ToString().ToUpper() + input.Substring(1);
+            }
+            else
+            {
+                return input.First().ToString().ToUpper() + input.Substring(1);
+            }
         }
 
         public void update_Click(object sender, EventArgs e)
@@ -92,13 +99,12 @@ namespace AAF_Launcher
 
         public string fetchInstall(string key)
         {
-            var installURL = @"http://10.0.0.3/api/user/install/" + key;
-            return (new WebClient()).DownloadString(installURL);
+            return API.Request("user", "install", key);
         }
 
         public void checkVersion()
         {
-            var versionURL = @"http://mods.australianarmedforces.org/version.txt";
+            var versionURL = Server + "version.txt";
             var versionNo = (new WebClient()).DownloadString(versionURL);
 
             if(versionNo != Version)
@@ -355,40 +361,48 @@ namespace AAF_Launcher
             }
             foreach (var xelement in xmlRepo.Descendants("file"))
             {
-                string str2 = xelement.Element("name").Value;
-                string a = xelement.Element("hash").Value;
-                string sUrlToReadFileFrom = this.Server + str2;
-                string str3 = Root + str2;
-                double percent = (double)filesDone/fileList;
-                if (Root != null)
+                if(backgroundWorker1.CancellationPending)
                 {
-                    using (MD5.Create())
+                    e.Cancel = true;
+                    break;
+                } 
+                else
+                {
+                    string str2 = xelement.Element("name").Value;
+                    string a = xelement.Element("hash").Value;
+                    string sUrlToReadFileFrom = this.Server + str2;
+                    string str3 = Root + str2;
+                    double percent = (double)filesDone/fileList;
+                    if (Root != null)
                     {
-                        if (System.IO.File.Exists(Root + str2))
+                        using (MD5.Create())
                         {
-                            FileStream stream = System.IO.File.OpenRead(Root + str2);
-                            string b = HashFile(stream);
-                            if (!string.Equals(a, b))
+                            if (System.IO.File.Exists(Root + str2))
                             {
-                                stream.Close();
-                                Form1.deleteFile(str3);
-                                this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
-                                this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
+                                FileStream stream = System.IO.File.OpenRead(Root + str2);
+                                string b = HashFile(stream);
+                                if (!string.Equals(a, b))
+                                {
+                                    stream.Close();
+                                    Form1.deleteFile(str3);
+                                    this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
+                                    this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
+                                }
+                                else
+                                {
+                                    this.Invoke(new Action(() => { downloadLbl_Controller(percent, 1, str2); }));
+                                }
                             }
                             else
                             {
-                                this.Invoke(new Action(() => { downloadLbl_Controller(percent, 1, str2); }));
+                                this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
+                                this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
                             }
                         }
-                        else
-                        {
-                            this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
-                            this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
-                        }
                     }
+                    filesDone++;
+                    backgroundWorker1.ReportProgress((int)(percent * 710));
                 }
-                filesDone++;
-                backgroundWorker1.ReportProgress((int)(percent*710));
             }
             if(filesDone == fileList)
             {
@@ -531,8 +545,9 @@ namespace AAF_Launcher
 
         private void pictureBox3_Click(object sender, EventArgs e)
         {
+            backgroundWorker1.CancelAsync();
             this.Hide();
-            var Form1 = new KeyForm(true);
+            var Form1 = new KeyForm();
             Form1.Show();
         }
     }

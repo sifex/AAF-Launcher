@@ -15,28 +15,25 @@ namespace AAF_Launcher
 {
     public partial class KeyForm : Form
     {
-        public KeyForm(bool force = false)
+        public KeyForm()
         {
-            if(OpenKey() != "" || force == false)
-            {
-                this.Hide();
-                var Form1 = new Form1(OpenKey());
-                Form1.Show(); 
-            }
-            else
-            {
-                InitializeComponent();
-            }
-        }
-
-        public static byte[] Post(string uri, NameValueCollection pairs)
+            InitializeComponent();
+            
+            this.textBox1.Text = OpenKey();
+        }        
+        
+        // Delete File
+        static bool deleteFile(string f)
         {
-            byte[] response = null;
-            using (WebClient client = new WebClient())
+            try
             {
-                response = client.UploadValues(uri, pairs);
+                File.Delete(f);
+                return true;
             }
-            return response;
+            catch (IOException)
+            {
+                return false;
+            }
         }
 
         public void SaveKey(string key)
@@ -56,8 +53,10 @@ namespace AAF_Launcher
 
             // Save Key
             // Write the string to a file.
+            deleteFile(Root + @"/scarlet_config.cfg");
+
             System.IO.StreamWriter file = new System.IO.StreamWriter(Root + @"/scarlet_config.cfg");
-            file.WriteLine(key);
+            file.WriteLine(key.Replace(System.Environment.NewLine, ""));
 
             file.Close();
         }
@@ -88,28 +87,14 @@ namespace AAF_Launcher
 
         private void button1_Click(object sender, EventArgs e)
         {   
-            string key = textBox1.Text;
-            var userIDURL = @"http://10.0.0.3/api/user/info/" + key + "/id/";
-            string userID = (new WebClient()).DownloadString(userIDURL);
+            string key = textBox1.Text.Replace(System.Environment.NewLine, "");
+            SaveKey(key);
+            string userID = API.Request("user", "info", key, "id");
             if (userID != "") 
             {
                 this.Hide();
-                var installURL = @"http://10.0.0.3/api/user/install/" + key + "/";
-                string installDir = (new WebClient()).DownloadString(installURL);
-
-                // Saves Key to ARMA 3 Local
-                SaveKey(key);
-
-                if (installDir == "")
-                {
-                    var myForm = new InstallForm(key);
-                    myForm.Show();
-                }
-                else
-                {
-                    var myForm = new Form1(key);
-                    myForm.Show();
-                }
+                var myForm = new InstallForm(key);
+                myForm.Show();
             }
             else
             {
