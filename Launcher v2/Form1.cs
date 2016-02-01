@@ -15,6 +15,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using System.Xaml;
+using Microsoft.VisualBasic;
 using System.Windows;
 
 namespace AAF_Launcher
@@ -37,10 +38,17 @@ namespace AAF_Launcher
 
         public const int WM_NCLBUTTONDOWN = 161;
         public const int HT_CAPTION = 2;
-        
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Interoperability", "CA1401:PInvokesShouldNotBeVisible")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "3")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "2")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImportAttribute("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd,
                          int Msg, int wParam, int lParam);
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Interoperability", "CA1401:PInvokesShouldNotBeVisible")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImportAttribute("user32.dll")]
         public static extern bool ReleaseCapture();
 
@@ -262,20 +270,6 @@ namespace AAF_Launcher
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
 
-            // Defining Root String (ARMA 3 Root Direcotry)
-            // Eg. "c:/program files (x86)/steam/steamapps/common/Arma 3"
-            /* Root = (string)Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath",null);
-
-            if(Root == null)
-            {
-                status = 3;
-                return;
-            }
-            else
-            {
-                Root =  Root + "/steamapps/common/Arma 3";
-            } */
-
             Root = this.installDirectory.Replace(@"\", @"/");
 
             if (!Directory.Exists(Root))
@@ -328,8 +322,7 @@ namespace AAF_Launcher
             // Delete the difference
             foreach (string dir in Enumerable.Except<string>((IEnumerable<string>)allDirs, (IEnumerable<string>)dbDirs, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase))
             {
-                System.Windows.Forms.MessageBox.Show("Deleting " + dir);
-                Directory.Delete(dir, true);
+                FileOperationAPIWrapper.MoveToRecycleBin(dir);
             }
 
             status = 6;
@@ -353,8 +346,7 @@ namespace AAF_Launcher
             // Delete the difference
             foreach (string file in Enumerable.Except<string>((IEnumerable<string>)allFiles, (IEnumerable<string>)dbFiles, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase))
             {
-                System.Windows.Forms.MessageBox.Show("Deleting " + file);
-                System.IO.File.Delete(file);
+                FileOperationAPIWrapper.MoveToRecycleBin(file);
             }
 
             status = 7;
@@ -414,10 +406,10 @@ namespace AAF_Launcher
             if(filesDone == fileList)
             {
                 status = 10;
-
                 this.strtGameBtn.Text = "Launch";
                 this.strtGameBtn.Click -= new System.EventHandler(this.update_Click);
                 this.strtGameBtn.Click += new System.EventHandler(this.strtGameBtn_Click);
+
             }
             else
             {
@@ -442,6 +434,7 @@ namespace AAF_Launcher
             this.fileLbl.BackColor = Color.Transparent;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
         public void downloadFile(string sUrlToReadFileFrom, string sFilePathToWriteFileTo, double percent, int fileList)
         {
             HttpWebResponse httpWebResponse = (HttpWebResponse)WebRequest.Create(new Uri(sUrlToReadFileFrom)).GetResponse();

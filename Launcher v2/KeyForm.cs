@@ -19,7 +19,7 @@ namespace AAF_Launcher
         {
             InitializeComponent();
             
-            this.textBox1.Text = OpenKey();
+            this.textBox1.Text = PersonalAccessKey.OpenKey();
         }        
         
         // Delete File
@@ -59,30 +59,6 @@ namespace AAF_Launcher
             file.WriteLine(key.Replace(System.Environment.NewLine, ""));
 
             file.Close();
-        }
-
-        public string OpenKey()
-        {
-            // Grab Steam Location
-            String Root = (string)Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", null);
-
-            if (Root == null)
-            {
-                return "";
-            }
-            else
-            {
-                // Append Arma 3 Location
-                Root = Root + "/steamapps/common/Arma 3";
-                if(File.Exists(Root + @"/scarlet_config.cfg"))
-                {
-                    return File.ReadAllText(Root + @"/scarlet_config.cfg");
-                }
-                else
-                {
-                    return "";
-                }
-            }
         }
 
         private void button1_Click(object sender, EventArgs e)
