@@ -24,7 +24,7 @@ namespace AAF_Launcher
         // Set Server Variable. This should be where index.php, html and the mods folder should be.
         public string Server = "http://mods.australianarmedforces.org/";
         public string ScarletAPI = "http://scarlet.australianarmedforces.org/";
-        public string Version = "0.6";
+        public string Version = "0.7";
         public int status = 1;
         public string ModsDirName;
         public string ModsRoot;
@@ -104,7 +104,7 @@ namespace AAF_Launcher
 
         public void webBrowser1_Navigating(object sender, WebBrowserNavigatingEventArgs e)
         {
-            if(e.Url.ToString() == @"http://australianarmedforces.org/")
+            if(e.Url.ToString() == @"http://australianarmedforces.org/" || e.Url.ToString() == @"http://development.australianarmedforces.org/projects/SCARLET/issues")
             {
                 //cancel the current event
                 e.Cancel = true;
@@ -160,18 +160,38 @@ namespace AAF_Launcher
             minimizeBtn.BackgroundImage = Properties.Resources.minimize2;
         }
 
-        public void updateStatus(string status)
+        public void updateStatus(string status, string colour = null)
         {
-            object[] o = new object[1];
+            if (!String.IsNullOrEmpty(colour))
+            {
+                object[] o = new object[2];
                 o[0] = status;
-                this.patchNotes.Document.InvokeScript("updateStatus", o);
+                o[1] = colour;
+                patchNotes.Document.InvokeScript("updateStatus", o);
+            }
+            else
+            {
+                object[] o = new object[1];
+                o[0] = status;
+                patchNotes.Document.InvokeScript("updateStatus", o);
+            }
         }
 
-        public void updateFile(string file)
+        public void updateFile(string file, string colour = null)
         {
-            object[] o = new object[1];
-            o[0] = file;
-            this.patchNotes.Document.InvokeScript("updatefile", o);
+            if(!String.IsNullOrEmpty(colour))
+            {
+                object[] o = new object[2];
+                o[0] = file;
+                o[1] = colour;
+                patchNotes.Document.InvokeScript("updatefile", o);
+            }
+            else
+            {
+                object[] o = new object[1];
+                o[0] = file;
+                patchNotes.Document.InvokeScript("updatefile", o);
+            }
         }
         
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
@@ -305,7 +325,7 @@ namespace AAF_Launcher
                                 this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
                             }
                         }
-                    }
+                    } 
                     filesDone++;
                     backgroundWorker1.ReportProgress((int)(percent * 710));
                 }
@@ -379,60 +399,45 @@ namespace AAF_Launcher
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             this.strtGameBtn.Enabled = true;
-            this.fileLbl.Text = "";
             switch (status)
             {
                 case 1:
-                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
-                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Unknown Error Occurred. Please contact Server Admin.";
+                    updateStatus("Error Code: 000" + status + " - " + "Unknown Error Occurred. Please contact Server Admin.", "203, 76, 0");
                     break;
                 case 2:
-                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
-                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Check Version or IEChangeVersion Error.";
+                    updateStatus("Error Code: 000" + status + " - " + "Check Version or IEChangeVersion Error.", "203, 76, 0");
                     break;
                 case 3:
-                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
-                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to find Arma 3 Root Directory.";
+                    updateStatus("Error Code: 000" + status + " - " + "Failed to find Arma 3 Root Directory.", "203, 76, 0");
                     break;
                 case 4:
-                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
-                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to create " + ModsDirName + " directory. Are you sure you don't have it open?";
+                    updateStatus("Error Code: 000" + status + " - " + "Failed to create " + ModsDirName + " directory. Are you sure you don't have it open?", "203, 76, 0");
                     break;
                 case 5:
-                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
-                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to remove extra existing folders.";
+                    updateStatus("Error Code: 000" + status + " - " + "Failed to remove extra existing folders.", "203, 76, 0");
                     break;
                 case 6:
-                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
-                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to remove extra existing files.";
+                    updateStatus("Error Code: 000" + status + " - " + "Failed to remove extra existing files.", "203, 76, 0");
                     break;
                 case 7:
-                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
-                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to successfully download mods.";
+                    updateStatus("Error Code: 000" + status + " - " + "Failed to successfully download mods.", "203, 76, 0");
                     break;
                 case 8:
-                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
-                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Cannot connect to update server";
+                    updateStatus("Error Code: 000" + status + " - " + "Cannot connect to update server", "203, 76, 0");
                     break;
                 case 9:
-                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
-                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Files Processed does not equal Files Retrieved. Please contact Server Admin.";
+                    updateStatus("Error Code: 000" + status + " - " + "Files Processed does not equal Files Retrieved. Please contact Server Admin.", "203, 76, 0");
                     break;
                 case 11:
-                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
-                    this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to find ARMA 3 Directory. Looking for " + Root;
+                    updateStatus("Error Code: 00" + status + " - " + "Failed to find ARMA 3 Directory. Looking for " + Root, "203, 76, 0");
                     break;
                 case 10:
-                    updateStatus("Mods are up to date. Ready to Launch.");
+                    updateStatus("Mods are up to date. Ready to Launch.", "100, 206, 63");
                     updateFile("");
-                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(100, 206, 63);
-                    this.downloadLbl.Text = "Mods are up to date. Ready to Launch.";
-                    this.pictureBox1.Size = new System.Drawing.Size(710, 31);
-                    this.pictureBox1.BackColor = System.Drawing.Color.FromArgb(100, 206, 63);
+                    this.pictureBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(206)))), ((int)(((byte)(63))))); ;
                     break;
                 default:
-                    this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(203, 76, 0);
-                    this.downloadLbl.Text = "Unknown Error - Code: " + status;
+                    updateStatus("Unknown Error - Code: " + status, "203, 76, 0");
                     break;
             }
         }

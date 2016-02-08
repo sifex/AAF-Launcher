@@ -69,6 +69,13 @@
             this.strtGameBtn.Text = "START GAME";
             this.strtGameBtn.UseVisualStyleBackColor = false;
             // 
+            // downloadLbl
+            // 
+            this.downloadLbl.Location = new System.Drawing.Point(0, 0);
+            this.downloadLbl.Name = "downloadLbl";
+            this.downloadLbl.Size = new System.Drawing.Size(100, 23);
+            this.downloadLbl.TabIndex = 13;
+            // 
             // minimizeBtn
             // 
             this.minimizeBtn.BackColor = System.Drawing.Color.Transparent;
@@ -103,9 +110,12 @@
             // 
             this.patchNotes.AllowWebBrowserDrop = false;
             this.patchNotes.CausesValidation = false;
+            this.patchNotes.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.patchNotes.IsWebBrowserContextMenuEnabled = false;
             this.patchNotes.Location = new System.Drawing.Point(0, 0);
             this.patchNotes.MinimumSize = new System.Drawing.Size(20, 20);
             this.patchNotes.Name = "patchNotes";
+            this.patchNotes.ScriptErrorsSuppressed = true;
             this.patchNotes.ScrollBarsEnabled = false;
             this.patchNotes.Size = new System.Drawing.Size(900, 450);
             this.patchNotes.TabIndex = 5;
@@ -137,21 +147,31 @@
             this.pictureBox2.TabIndex = 9;
             this.pictureBox2.TabStop = false;
             // 
+            // fileLbl
+            // 
+            this.fileLbl.Location = new System.Drawing.Point(0, 0);
+            this.fileLbl.Name = "fileLbl";
+            this.fileLbl.Size = new System.Drawing.Size(100, 23);
+            this.fileLbl.TabIndex = 12;
+            // 
             // pictureBox3
             // 
             this.pictureBox3.BackColor = System.Drawing.Color.Transparent;
             this.pictureBox3.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pictureBox3.Enabled = false;
             this.pictureBox3.Image = global::AAF_Launcher.Properties.Resources.ic_settings_48px_128;
             this.pictureBox3.Location = new System.Drawing.Point(854, 105);
             this.pictureBox3.Name = "pictureBox3";
             this.pictureBox3.Size = new System.Drawing.Size(32, 33);
             this.pictureBox3.TabIndex = 11;
             this.pictureBox3.TabStop = false;
+            this.pictureBox3.Visible = false;
             this.pictureBox3.Click += new System.EventHandler(this.pictureBox3_Click);
             // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.Transparent;
+            this.panel1.BackgroundImage = global::AAF_Launcher.Properties.Resources.bg;
             this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
@@ -190,7 +210,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
