@@ -1,4 +1,3 @@
-
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -23,7 +22,6 @@ namespace AAF_Launcher
     public partial class Form1 : Form
     {
         // Set Server Variable. This should be where index.php, html and the mods folder should be.
-        // Eg: http://exmaple.com/Arma3Updater/
         public string Server = "http://mods.australianarmedforces.org/";
         public string ScarletAPI = "http://scarlet.australianarmedforces.org/";
         public string Version = "0.6";
@@ -31,35 +29,26 @@ namespace AAF_Launcher
         public string ModsDirName;
         public string ModsRoot;
         public string Root;
-        public string Username;
-
-        public string key;
+        public string key = Util.OpenKey();
+        public string Username = API.Request("user", "info", Util.OpenKey(), "username");
         public string installDirectory;
 
+        public bool WorkerSupportsCancellation = true;
         public const int WM_NCLBUTTONDOWN = 161;
         public const int HT_CAPTION = 2;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Interoperability", "CA1401:PInvokesShouldNotBeVisible")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "return")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "3")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "2")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImportAttribute("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd,
                          int Msg, int wParam, int lParam);
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Interoperability", "CA1401:PInvokesShouldNotBeVisible")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
+
         [DllImportAttribute("user32.dll")]
         public static extern bool ReleaseCapture();
-
-        public bool WorkerSupportsCancellation = true;
-
-        public Form1(string key)
+        
+        public Form1()
         {
-            this.key = key;
-            this.installDirectory = fetchInstall(key);
             checkVersion();
-            changeIEVersion(11);
+            this.installDirectory = API.Request("user", "install", key);
+            Util.changeIEVersion(11);
 
             status = 2;
 
@@ -80,43 +69,26 @@ namespace AAF_Launcher
         {
             // Set Username
             Username = API.Request("user", "info", key, "username");
-
             this.patchNotes.Refresh(WebBrowserRefreshOption.Completely);
-            this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
-            this.downloadLbl.Text = "Hi " + FirstCharToUpper(Username) + ".";
-            this.fileLbl.Text = "Current Install Directory is: " + installDirectory;
-            this.fileLbl.Location = new System.Drawing.Point(this.downloadLbl.Location.X + this.downloadLbl.Size.Width, 380);
-            this.fileLbl.BackColor = Color.Transparent;
         }
 
-        public static string FirstCharToUpper(string input)
+        private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
-            if (String.IsNullOrEmpty(input))
-            {
-                throw new ArgumentException("ARGH!");
-            }
-            else
-            {
-                return input.First().ToString().ToUpper() + input.Substring(1);
-            }
+            updateStatus("Hi " + Util.FirstCharToUpper(Username) + ".");
+            updateFile("Current Install Directory is: " + installDirectory);
         }
 
+        // On Update Button Click
         public void update_Click(object sender, EventArgs e)
         {
             backgroundWorker1.RunWorkerAsync();
-            this.downloadLbl.Text = "Fetching Repo";
-            this.downloadLbl.BackColor = Color.Transparent;
-            this.fileLbl.Text = "";
-            this.fileLbl.BackColor = Color.Transparent;
+            updateStatus("Fetching Repo");
+            updateFile("");
 
             this.strtGameBtn.Enabled = false;
         }
 
-        public string fetchInstall(string key)
-        {
-            return API.Request("user", "install", key);
-        }
-
+        // Check Current version on Server
         public void checkVersion()
         {
             var versionURL = Server + "version.txt";
@@ -132,11 +104,18 @@ namespace AAF_Launcher
 
         public void webBrowser1_Navigating(object sender, WebBrowserNavigatingEventArgs e)
         {
-            //cancel the current event
-            e.Cancel = true;
+            if(e.Url.ToString() == @"http://australianarmedforces.org/")
+            {
+                //cancel the current event
+                e.Cancel = true;
 
-            //this opens the URL in the user's default browser
-            Process.Start(e.Url.ToString());
+                //this opens the URL in the user's default browser
+                Process.Start(e.Url.ToString());
+            }
+            else
+            {
+
+            }
         }
 
         // Makes the main window (Form1) dragable
@@ -180,93 +159,21 @@ namespace AAF_Launcher
         {
             minimizeBtn.BackgroundImage = Properties.Resources.minimize2;
         }
+
+        public void updateStatus(string status)
+        {
+            object[] o = new object[1];
+                o[0] = status;
+                this.patchNotes.Document.InvokeScript("updateStatus", o);
+        }
+
+        public void updateFile(string file)
+        {
+            object[] o = new object[1];
+            o[0] = file;
+            this.patchNotes.Document.InvokeScript("updatefile", o);
+        }
         
-        // Delete File
-        static bool deleteFile(string f)
-        {
-            try
-            {
-                File.Delete(f);
-                return true;
-            }
-            catch (IOException)
-            {
-                return false;
-            }
-        }
-
-        public string HashFile(FileStream stream)
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            if (stream != null)
-            {
-                stream.Seek(0L, SeekOrigin.Begin);
-                foreach (byte num in MD5.Create().ComputeHash((Stream)stream))
-                {
-                    stringBuilder.Append(num.ToString("x2"));
-                }
-                stream.Seek(0L, SeekOrigin.Begin);
-            }
-            return stringBuilder.ToString();
-        }
-
-        static string generateHash(string input)
-        {
-            MD5 md5Hasher = MD5.Create();
-            byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(input));
-            return BitConverter.ToString(data);
-        }
-
-        private bool ServerStatus(string url)
-        {
-            try
-            {
-                HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-                int num1 = 30000;
-                httpWebRequest.Timeout = num1;
-                int num2 = 0;
-                httpWebRequest.AllowAutoRedirect = num2 != 0;
-                string str = "HEAD";
-                httpWebRequest.Method = str;
-                using (httpWebRequest.GetResponse())
-                    return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private void changeIEVersion(int version)
-        {
-            object regCheck = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Internet Explorer\\Main\\FeatureControl\\FEATURE_BROWSER_EMULATION", Process.GetCurrentProcess().ProcessName + ".exe", null);
-            if (regCheck == null) 
-            {
-                int RegVal;
-                int BrowserVer = version;
-
-                // Set the appropriate IE version
-                if (BrowserVer >= 11)
-                    RegVal = 11001;
-                else if (BrowserVer == 10)
-                    RegVal = 10001;
-                else if (BrowserVer == 9)
-                    RegVal = 9999;
-                else if (BrowserVer == 8)
-                    RegVal = 8888;
-                else
-                    RegVal = 7000;
-
-                // set the actual key
-
-                Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION");
-                RegistryKey Key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
-                
-                Key.SetValue(Process.GetCurrentProcess().ProcessName + ".exe", RegVal, RegistryValueKind.DWord);
-                Key.Close();
-            }
-        }
-
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
 
@@ -379,11 +286,11 @@ namespace AAF_Launcher
                             if (System.IO.File.Exists(Root + str2))
                             {
                                 FileStream stream = System.IO.File.OpenRead(Root + str2);
-                                string b = HashFile(stream);
+                                string b = Util.HashFile(stream);
                                 if (!string.Equals(a, b))
                                 {
                                     stream.Close();
-                                    Form1.deleteFile(str3);
+                                    FileOperationAPIWrapper.MoveToRecycleBin(str3);
                                     this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                                     this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
                                 }
@@ -419,22 +326,24 @@ namespace AAF_Launcher
 
         public void downloadLbl_Controller(double percentage, int type, string currentFile)
         {
-            this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(0, 121, 203);
-            this.downloadLbl.Location = new System.Drawing.Point(14, 380);
+            string typer;
             if (type == 1)
             {
-                this.downloadLbl.Text = "Verifying Mods";
-            } else
-            {
-                this.downloadLbl.Text = "Downloading Updates";
+                typer = "Verifying Mods";
+                updateStatus(typer);
+                updateFile("");
             }
-            this.downloadLbl.Text = this.downloadLbl.Text + " - " + (Math.Round((double)(percentage * 100),2).ToString()) + "%";
-            this.fileLbl.Text = "    " + @currentFile;
-            this.fileLbl.Location = new System.Drawing.Point(this.downloadLbl.Location.X + this.downloadLbl.Size.Width, 380);
-            this.fileLbl.BackColor = Color.Transparent;
+            else
+            {
+                typer = "Downloading Mods";
+                updateStatus(typer);
+                updateFile("");
+            }
+            
+            updateStatus(typer + " - " + (Math.Round((double)(percentage * 100), 2).ToString()) + "%");
+            updateFile(@currentFile);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
         public void downloadFile(string sUrlToReadFileFrom, string sFilePathToWriteFileTo, double percent, int fileList)
         {
             HttpWebResponse httpWebResponse = (HttpWebResponse)WebRequest.Create(new Uri(sUrlToReadFileFrom)).GetResponse();
@@ -514,6 +423,8 @@ namespace AAF_Launcher
                     this.downloadLbl.Text = "Error Code: " + status + " - " + "Failed to find ARMA 3 Directory. Looking for " + Root;
                     break;
                 case 10:
+                    updateStatus("Mods are up to date. Ready to Launch.");
+                    updateFile("");
                     this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(100, 206, 63);
                     this.downloadLbl.Text = "Mods are up to date. Ready to Launch.";
                     this.pictureBox1.Size = new System.Drawing.Size(710, 31);
@@ -526,29 +437,19 @@ namespace AAF_Launcher
             }
         }
 
-        //Starts the game
+        // Starts the game
         private void strtGameBtn_Click(object sender, EventArgs e)
         {
-            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/arma3launcher.exe", "-nosplash -skipIntro -mod=" + getModListForGameExec());
+            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/arma3launcher.exe", "-nosplash -skipIntro");
             this.Close();
-        }
-
-        private string getModListForGameExec()
-        {
-            string stringReturn = "";
-            foreach(string subdirectoryEntries in Directory.GetDirectories(ModsRoot))
-            {
-                stringReturn += ModsDirName + "/" + subdirectoryEntries.Replace(ModsRoot, "") + ";";
-            }
-            return stringReturn;
         }
 
         private void pictureBox3_Click(object sender, EventArgs e)
         {
             backgroundWorker1.CancelAsync();
-            this.Hide();
-            var Form1 = new KeyForm();
-            Form1.Show();
+            // this.Hide();
+            // var Form1 = new KeyForm();
+            // Form1.Show();
         }
     }
 }

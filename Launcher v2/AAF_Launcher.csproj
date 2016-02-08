@@ -99,36 +99,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API.cs" />
-    <Compile Include="FileOperationAPIWrapper.cs" />
+    <Compile Include="Vendor\FileOperationAPIWrapper.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="InstallForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="InstallForm.Designer.cs">
-      <DependentUpon>InstallForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="KeyForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="KeyForm.Designer.cs">
-      <DependentUpon>KeyForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="PersonalAccessKey.cs" />
+    <Compile Include="Util.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="InstallForm.resx">
-      <DependentUpon>InstallForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="KeyForm.resx">
-      <DependentUpon>KeyForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -140,7 +122,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="AAF_Launcher_TemporaryKey.pfx" />
     <None Include="app.manifest">
       <SubType>Designer</SubType>
     </None>

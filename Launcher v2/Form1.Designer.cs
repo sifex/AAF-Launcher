@@ -1,7 +1,4 @@
-﻿using System;
-using System.Drawing;
-
-namespace AAF_Launcher
+﻿namespace AAF_Launcher
 {
     public partial class Form1
     {
@@ -33,17 +30,16 @@ namespace AAF_Launcher
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.backgroundWorker1.WorkerSupportsCancellation = true;
             this.strtGameBtn = new System.Windows.Forms.Button();
             this.downloadLbl = new System.Windows.Forms.Label();
             this.minimizeBtn = new System.Windows.Forms.Button();
             this.closeBtn = new System.Windows.Forms.Button();
             this.patchNotes = new System.Windows.Forms.WebBrowser();
-            this.panel1 = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.fileLbl = new System.Windows.Forms.Label();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.panel1 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
@@ -52,6 +48,7 @@ namespace AAF_Launcher
             // backgroundWorker1
             // 
             this.backgroundWorker1.WorkerReportsProgress = true;
+            this.backgroundWorker1.WorkerSupportsCancellation = true;
             this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
             this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
             this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
@@ -71,18 +68,6 @@ namespace AAF_Launcher
             this.strtGameBtn.TabIndex = 1;
             this.strtGameBtn.Text = "START GAME";
             this.strtGameBtn.UseVisualStyleBackColor = false;
-            // 
-            // downloadLbl
-            // 
-            this.downloadLbl.AutoSize = true;
-            this.downloadLbl.BackColor = System.Drawing.Color.Transparent;
-            this.downloadLbl.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(74)))), ((int)(((byte)(105)))), ((int)(((byte)(136)))));
-            this.downloadLbl.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.downloadLbl.Location = new System.Drawing.Point(14, 380);
-            this.downloadLbl.Name = "downloadLbl";
-            this.downloadLbl.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.downloadLbl.Size = new System.Drawing.Size(0, 13);
-            this.downloadLbl.TabIndex = 2;
             // 
             // minimizeBtn
             // 
@@ -127,17 +112,8 @@ namespace AAF_Launcher
             this.patchNotes.TabStop = false;
             this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/", System.UriKind.Absolute);
             this.patchNotes.WebBrowserShortcutsEnabled = false;
+            this.patchNotes.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
             this.patchNotes.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this.webBrowser1_Navigating);
-            // 
-            // panel1
-            // 
-            this.panel1.BackgroundImage = global::AAF_Launcher.Properties.Resources.bg;
-            this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(832, 26);
-            this.panel1.TabIndex = 6;
-            this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.titleBarPanel_Mousedown);
             // 
             // pictureBox1
             // 
@@ -161,18 +137,6 @@ namespace AAF_Launcher
             this.pictureBox2.TabIndex = 9;
             this.pictureBox2.TabStop = false;
             // 
-            // fileLbl
-            // 
-            this.fileLbl.AutoSize = true;
-            this.fileLbl.BackColor = System.Drawing.Color.Transparent;
-            this.fileLbl.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(74)))), ((int)(((byte)(105)))), ((int)(((byte)(136)))));
-            this.fileLbl.Location = new System.Drawing.Point(14, 380);
-            this.fileLbl.Margin = new System.Windows.Forms.Padding(0);
-            this.fileLbl.Name = "fileLbl";
-            this.fileLbl.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.fileLbl.Size = new System.Drawing.Size(0, 13);
-            this.fileLbl.TabIndex = 10;
-            // 
             // pictureBox3
             // 
             this.pictureBox3.BackColor = System.Drawing.Color.Transparent;
@@ -184,6 +148,16 @@ namespace AAF_Launcher
             this.pictureBox3.TabIndex = 11;
             this.pictureBox3.TabStop = false;
             this.pictureBox3.Click += new System.EventHandler(this.pictureBox3_Click);
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.Color.Transparent;
+            this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(832, 26);
+            this.panel1.TabIndex = 6;
+            this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.titleBarPanel_Mousedown);
             // 
             // Form1
             // 
@@ -227,12 +201,12 @@ namespace AAF_Launcher
         private System.Windows.Forms.Label downloadLbl;
         private System.Windows.Forms.Button closeBtn;
         private System.Windows.Forms.Button minimizeBtn;
-        private System.Windows.Forms.Panel panel1;
         internal System.Windows.Forms.WebBrowser patchNotes;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.Label fileLbl;
         private System.Windows.Forms.PictureBox pictureBox3;
+        private System.Windows.Forms.Panel panel1;
     }
 }
 
