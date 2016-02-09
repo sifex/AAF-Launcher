@@ -85,6 +85,8 @@ namespace AAF_Launcher
             updateStatus("Fetching Repo");
             updateFile("");
 
+            this.strtGameBtn.Click -= new System.EventHandler(this.update_Click);
+            this.strtGameBtn.Click += new System.EventHandler(this.strtGameBtn_Click);
             this.strtGameBtn.Enabled = false;
         }
 
@@ -334,8 +336,6 @@ namespace AAF_Launcher
             {
                 status = 10;
                 this.strtGameBtn.Text = "Launch";
-                this.strtGameBtn.Click -= new System.EventHandler(this.update_Click);
-                this.strtGameBtn.Click += new System.EventHandler(this.strtGameBtn_Click);
 
             }
             else
@@ -445,7 +445,7 @@ namespace AAF_Launcher
         // Starts the game
         private void strtGameBtn_Click(object sender, EventArgs e)
         {
-            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/arma3launcher.exe", "-nosplash -skipIntro");
+            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/arma3.exe", "-nosplash -skipIntro");
             this.Close();
         }
 
