@@ -1,9 +1,9 @@
 <?php 
 	
 	$version = file_get_contents('version.txt');
-	$disabled;
+	$disabled = false;
 	$downloadURL = false;
-	$callout;
+	$callout = "";
 	
 	
 	if(!glob("release/" . $version . "/*.zip")){
@@ -63,8 +63,11 @@ h2 {
 <div class="row column text-center">
 <?php echo $callout; ?>
 <!-- <div class="logo"></div> -->
+
 <h1>AAF Launcher</h1>
 <h2><small>Changing the ARMA Modding World Forever.</small></h2>
+<img src="http://i.imgur.com/4X73fR3.png" alt="">
+<br /><br />
 <p class="lead">Download and start updating right away! <a href="https://media.giphy.com/media/wErJXg1tIgHXG/giphy.gif">Just do it!</a></p>
 <a href="<?php echo ($downloadURL ? $downloadURL : '#'); ?>" class="button large <?php echo ($disabled ? 'disabled' : ''); ?>">Download Now</a>
 <a href="#" class="button large hollow radius">Donate</a>
