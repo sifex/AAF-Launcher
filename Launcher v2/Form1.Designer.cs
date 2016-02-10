@@ -1,4 +1,6 @@
-﻿namespace AAF_Launcher
+﻿
+
+namespace AAF_Launcher
 {
     public partial class Form1
     {
@@ -115,15 +117,12 @@
             this.patchNotes.Location = new System.Drawing.Point(0, 0);
             this.patchNotes.MinimumSize = new System.Drawing.Size(20, 20);
             this.patchNotes.Name = "patchNotes";
-            this.patchNotes.ScriptErrorsSuppressed = true;
             this.patchNotes.ScrollBarsEnabled = false;
             this.patchNotes.Size = new System.Drawing.Size(900, 450);
             this.patchNotes.TabIndex = 5;
             this.patchNotes.TabStop = false;
             this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/", System.UriKind.Absolute);
-            this.patchNotes.WebBrowserShortcutsEnabled = false;
             this.patchNotes.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
-            this.patchNotes.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this.webBrowser1_Navigating);
             // 
             // pictureBox1
             // 

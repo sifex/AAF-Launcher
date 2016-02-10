@@ -16,9 +16,11 @@ using System.Xml.Linq;
 using System.Xaml;
 using Microsoft.VisualBasic;
 using System.Windows;
+using System.Security.Permissions;
 
 namespace AAF_Launcher
 {
+    [System.Runtime.InteropServices.ComVisibleAttribute(true)]
     public partial class Form1 : Form
     {
         // Set Server Variable. This should be where index.php, html and the mods folder should be.
@@ -31,7 +33,7 @@ namespace AAF_Launcher
         public string Root;
         public string key = Util.OpenKey();
         public string Username = API.Request("user", "info", Util.OpenKey(), "username");
-        public string installDirectory;
+        public string installDirectory = API.Request("user", "install", Util.OpenKey());
 
         public bool WorkerSupportsCancellation = true;
         public const int WM_NCLBUTTONDOWN = 161;
@@ -47,9 +49,8 @@ namespace AAF_Launcher
         public Form1()
         {
             checkVersion();
-            this.installDirectory = API.Request("user", "install", key);
             Util.changeIEVersion(11);
-
+            
             status = 2;
 
             // UI Initialize
@@ -67,6 +68,8 @@ namespace AAF_Launcher
 
         public void postStartup()
         {
+            this.patchNotes.ObjectForScripting = this;
+
             // Set Username
             Username = API.Request("user", "info", key, "username");
             this.patchNotes.Refresh(WebBrowserRefreshOption.Completely);
@@ -104,20 +107,17 @@ namespace AAF_Launcher
             }
         }
 
-        public void webBrowser1_Navigating(object sender, WebBrowserNavigatingEventArgs e)
+        public void openURL(string URL)
         {
-            if(e.Url.ToString() == @"http://australianarmedforces.org/" || e.Url.ToString() == @"http://development.australianarmedforces.org/projects/SCARLET/issues")
-            {
-                //cancel the current event
-                e.Cancel = true;
+            Process.Start(URL);
+        }
 
-                //this opens the URL in the user's default browser
-                Process.Start(e.Url.ToString());
-            }
-            else
-            {
-
-            }
+        // Makes the main window (Form1) dragable
+        public void refreshStatus()
+        {
+            installDirectory = API.Request("user", "install", Util.OpenKey());
+            updateStatus("Hi " + Util.FirstCharToUpper(Username) + ".");
+            updateFile("Current Install Directory is: " + installDirectory);
         }
 
         // Makes the main window (Form1) dragable
@@ -302,7 +302,7 @@ namespace AAF_Launcher
                     string str3 = Root + str2;
                     double percent = (double)filesDone/fileList;
                     if (Root != null)
-                    {
+                    { 
                         using (MD5.Create())
                         {
                             if (System.IO.File.Exists(Root + str2))
@@ -326,7 +326,7 @@ namespace AAF_Launcher
                                 this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                                 this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
                             }
-                        }
+                        } 
                     } 
                     filesDone++;
                     backgroundWorker1.ReportProgress((int)(percent * 710));
@@ -362,6 +362,11 @@ namespace AAF_Launcher
             
             updateStatus(typer + " - " + (Math.Round((double)(percentage * 100), 2).ToString()) + "%");
             updateFile(@currentFile);
+        }
+
+        public void taskBarProgress_Controller(double percentage)
+        {
+            
         }
 
         public void downloadFile(string sUrlToReadFileFrom, string sFilePathToWriteFileTo, double percent, int fileList)
@@ -445,8 +450,18 @@ namespace AAF_Launcher
         // Starts the game
         private void strtGameBtn_Click(object sender, EventArgs e)
         {
-            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/arma3.exe", "-nosplash -skipIntro");
+            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/arma3.exe", "-nosplash -skipIntro -mod=" + getModListForGameExec());
             this.Close();
+        }
+
+        private string getModListForGameExec()
+        {
+            string stringReturn = "";
+            foreach (string subdirectoryEntries in Directory.GetDirectories(ModsRoot))
+            {
+                stringReturn += ModsDirName + "/" + subdirectoryEntries.Replace(ModsRoot, "") + ";";
+            }
+            return stringReturn;
         }
 
         private void pictureBox3_Click(object sender, EventArgs e)
