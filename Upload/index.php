@@ -8,13 +8,13 @@
 	
 	if(!glob("release/" . $version . "/*.zip")){
 	    $disabled = true;
-		$callout = '<span class="alert label">The current version is still under development. The download has been disabled at this time.</span><br /><br /><br />';
+		$callout = '<span class="alert label">The current version is still under development. The download has been disabled at this time.</span><br /><br />';
 	} else {
 		$downloadURL =  "/release/latest/";
 	}
 	
 	if(isset($_GET['update'])) {
-		$callout = '<span class="alert label">You do not have an up to date version of the Mod Updater. Please download the updated version below.</span><br /><br /><br />';
+		$callout = '<span class="alert label">You do not have an up to date version of the Mod Updater. Please download the updated version below.</span><br /><br />';
 	}
 	
 	?>
@@ -61,7 +61,7 @@ h2 {
  
 <div class="callout large">
 <div class="row column text-center">
-<?php echo $callout; ?>
+
 <!-- <div class="logo"></div> -->
 
 <h1>AAF Launcher</h1>
@@ -69,6 +69,7 @@ h2 {
 <img src="http://i.imgur.com/4X73fR3.png" alt="">
 <br /><br />
 <p class="lead">Download and start updating right away! <a href="https://media.giphy.com/media/wErJXg1tIgHXG/giphy.gif">Just do it!</a></p>
+<?php echo $callout; ?>
 <a href="<?php echo ($downloadURL ? $downloadURL : '#'); ?>" class="button large <?php echo ($disabled ? 'disabled' : ''); ?>">Download Now</a>
 <a href="#" class="button large hollow radius">Donate</a>
 <div>
