@@ -32,19 +32,11 @@ namespace AAF_Launcher
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.strtGameBtn = new System.Windows.Forms.Button();
-            this.downloadLbl = new System.Windows.Forms.Label();
-            this.minimizeBtn = new System.Windows.Forms.Button();
-            this.closeBtn = new System.Windows.Forms.Button();
             this.patchNotes = new System.Windows.Forms.WebBrowser();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.fileLbl = new System.Windows.Forms.Label();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
-            this.panel1 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.SuspendLayout();
             // 
             // backgroundWorker1
@@ -52,61 +44,7 @@ namespace AAF_Launcher
             this.backgroundWorker1.WorkerReportsProgress = true;
             this.backgroundWorker1.WorkerSupportsCancellation = true;
             this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
-            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
             this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
-            // 
-            // strtGameBtn
-            // 
-            this.strtGameBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(13)))), ((int)(((byte)(21)))));
-            this.strtGameBtn.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.strtGameBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(121)))), ((int)(((byte)(203)))));
-            this.strtGameBtn.FlatAppearance.BorderSize = 2;
-            this.strtGameBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.strtGameBtn.Font = new System.Drawing.Font("Verdana", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.strtGameBtn.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(121)))), ((int)(((byte)(203)))));
-            this.strtGameBtn.Location = new System.Drawing.Point(736, 379);
-            this.strtGameBtn.Name = "strtGameBtn";
-            this.strtGameBtn.Size = new System.Drawing.Size(150, 56);
-            this.strtGameBtn.TabIndex = 1;
-            this.strtGameBtn.Text = "START GAME";
-            this.strtGameBtn.UseVisualStyleBackColor = false;
-            // 
-            // downloadLbl
-            // 
-            this.downloadLbl.Location = new System.Drawing.Point(0, 0);
-            this.downloadLbl.Name = "downloadLbl";
-            this.downloadLbl.Size = new System.Drawing.Size(100, 23);
-            this.downloadLbl.TabIndex = 13;
-            // 
-            // minimizeBtn
-            // 
-            this.minimizeBtn.BackColor = System.Drawing.Color.Transparent;
-            this.minimizeBtn.BackgroundImage = global::AAF_Launcher.Properties.Resources.minimize2;
-            this.minimizeBtn.FlatAppearance.BorderSize = 0;
-            this.minimizeBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.minimizeBtn.Location = new System.Drawing.Point(832, 0);
-            this.minimizeBtn.Name = "minimizeBtn";
-            this.minimizeBtn.Size = new System.Drawing.Size(34, 26);
-            this.minimizeBtn.TabIndex = 4;
-            this.minimizeBtn.UseVisualStyleBackColor = false;
-            this.minimizeBtn.Click += new System.EventHandler(this.minimizeBtn_Click);
-            this.minimizeBtn.MouseEnter += new System.EventHandler(this.minimizeBtn_MouseEnter);
-            this.minimizeBtn.MouseLeave += new System.EventHandler(this.minimizeBtn_MouseLeave);
-            // 
-            // closeBtn
-            // 
-            this.closeBtn.BackColor = System.Drawing.Color.Transparent;
-            this.closeBtn.BackgroundImage = global::AAF_Launcher.Properties.Resources.close2;
-            this.closeBtn.FlatAppearance.BorderSize = 0;
-            this.closeBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.closeBtn.Location = new System.Drawing.Point(866, 0);
-            this.closeBtn.Name = "closeBtn";
-            this.closeBtn.Size = new System.Drawing.Size(34, 26);
-            this.closeBtn.TabIndex = 3;
-            this.closeBtn.UseVisualStyleBackColor = false;
-            this.closeBtn.Click += new System.EventHandler(this.closeBtn_Click);
-            this.closeBtn.MouseEnter += new System.EventHandler(this.closeBtn_MouseEnter);
-            this.closeBtn.MouseLeave += new System.EventHandler(this.closeBtn_MouseLeave);
             // 
             // patchNotes
             // 
@@ -121,7 +59,7 @@ namespace AAF_Launcher
             this.patchNotes.Size = new System.Drawing.Size(900, 450);
             this.patchNotes.TabIndex = 5;
             this.patchNotes.TabStop = false;
-            this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/", System.UriKind.Absolute);
+            this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/?scarletKey=" + Util.OpenKey(), System.UriKind.Absolute);
             this.patchNotes.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
             // 
             // pictureBox1
@@ -145,38 +83,7 @@ namespace AAF_Launcher
             this.pictureBox2.Size = new System.Drawing.Size(710, 31);
             this.pictureBox2.TabIndex = 9;
             this.pictureBox2.TabStop = false;
-            // 
-            // fileLbl
-            // 
-            this.fileLbl.Location = new System.Drawing.Point(0, 0);
-            this.fileLbl.Name = "fileLbl";
-            this.fileLbl.Size = new System.Drawing.Size(100, 23);
-            this.fileLbl.TabIndex = 12;
-            // 
-            // pictureBox3
-            // 
-            this.pictureBox3.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBox3.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pictureBox3.Enabled = false;
-            this.pictureBox3.Image = global::AAF_Launcher.Properties.Resources.ic_settings_48px_128;
-            this.pictureBox3.Location = new System.Drawing.Point(854, 105);
-            this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(32, 33);
-            this.pictureBox3.TabIndex = 11;
-            this.pictureBox3.TabStop = false;
-            this.pictureBox3.Visible = false;
-            this.pictureBox3.Click += new System.EventHandler(this.pictureBox3_Click);
-            // 
-            // panel1
-            // 
-            this.panel1.BackColor = System.Drawing.Color.Transparent;
-            this.panel1.BackgroundImage = global::AAF_Launcher.Properties.Resources.bg;
-            this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(832, 26);
-            this.panel1.TabIndex = 6;
-            this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.titleBarPanel_Mousedown);
+            this.pictureBox2.Visible = false;
             // 
             // Form1
             // 
@@ -188,15 +95,8 @@ namespace AAF_Launcher
             this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(900, 450);
             this.ControlBox = false;
-            this.Controls.Add(this.pictureBox3);
-            this.Controls.Add(this.fileLbl);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.pictureBox2);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.minimizeBtn);
-            this.Controls.Add(this.closeBtn);
-            this.Controls.Add(this.downloadLbl);
-            this.Controls.Add(this.strtGameBtn);
             this.Controls.Add(this.patchNotes);
             this.ForeColor = System.Drawing.Color.White;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -207,7 +107,6 @@ namespace AAF_Launcher
             this.Text = "AAF Updater";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -215,16 +114,9 @@ namespace AAF_Launcher
 
         #endregion
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
-        private System.Windows.Forms.Button strtGameBtn;
-        private System.Windows.Forms.Label downloadLbl;
-        private System.Windows.Forms.Button closeBtn;
-        private System.Windows.Forms.Button minimizeBtn;
         internal System.Windows.Forms.WebBrowser patchNotes;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBox2;
-        private System.Windows.Forms.Label fileLbl;
-        private System.Windows.Forms.PictureBox pictureBox3;
-        private System.Windows.Forms.Panel panel1;
     }
 }
 

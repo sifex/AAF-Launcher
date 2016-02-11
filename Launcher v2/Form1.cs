@@ -26,7 +26,7 @@ namespace AAF_Launcher
         // Set Server Variable. This should be where index.php, html and the mods folder should be.
         public string Server = "http://mods.australianarmedforces.org/";
         public string ScarletAPI = "http://scarlet.australianarmedforces.org/";
-        public string Version = "0.7";
+        public string Version = "0.7beta";
         public int status = 1;
         public string ModsDirName;
         public string ModsRoot;
@@ -62,8 +62,8 @@ namespace AAF_Launcher
             // Disable Start Game Button for now
             // strtGameBtn.Enabled = false;
 
-            this.strtGameBtn.Text = "Begin Update";
-            this.strtGameBtn.Click += new System.EventHandler(this.update_Click);
+            // this.strtGameBtn.Text = "Begin Update";
+            // this.strtGameBtn.Click += new System.EventHandler(this.update_Click);
         }
 
         public void postStartup()
@@ -77,20 +77,18 @@ namespace AAF_Launcher
 
         private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
-            updateStatus("Hi " + Util.FirstCharToUpper(Username) + ".");
-            updateFile("Current Install Directory is: " + installDirectory);
+            updateStatus("Hi " + Util.FirstCharToUpper(Username) + ".", "33, 153, 232");
+            updateFile("Current Install Directory is: " + installDirectory, "74, 105, 136");
         }
 
         // On Update Button Click
-        public void update_Click(object sender, EventArgs e)
+        public void update_Click()
         {
             backgroundWorker1.RunWorkerAsync();
             updateStatus("Fetching Repo");
             updateFile("");
-
-            this.strtGameBtn.Click -= new System.EventHandler(this.update_Click);
-            this.strtGameBtn.Click += new System.EventHandler(this.strtGameBtn_Click);
-            this.strtGameBtn.Enabled = false;
+            patchNotes.Document.InvokeScript("disableConfig");
+            // this.strtGameBtn.Enabled = false;
         }
 
         // Check Current version on Server
@@ -116,86 +114,91 @@ namespace AAF_Launcher
         public void refreshStatus()
         {
             installDirectory = API.Request("user", "install", Util.OpenKey());
-            updateStatus("Hi " + Util.FirstCharToUpper(Username) + ".");
-            updateFile("Current Install Directory is: " + installDirectory);
+            updateStatus("Hi " + Util.FirstCharToUpper(Username) + ".", "33, 153, 232");
+            updateFile("Current Install Directory is: " + installDirectory, "74, 105, 136");
         }
 
         // Makes the main window (Form1) dragable
-        private void titleBarPanel_Mousedown(object sender, MouseEventArgs e)
+        public void drag()
         {
-            if (e.Button == MouseButtons.Left)
-            {
-                ReleaseCapture();
-                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
-            }
+            SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
         }
 
         // Close Button
-        private void closeBtn_Click(object sender, EventArgs e)
+        public void closeBtn_Click()
         {
             System.Windows.Forms.Application.Exit();
         }
 
-        private void closeBtn_MouseEnter(object sender, EventArgs e)
-        {
-            closeBtn.BackgroundImage = Properties.Resources.close1;
-        }
-
-        private void closeBtn_MouseLeave(object sender, EventArgs e)
-        {
-            closeBtn.BackgroundImage = Properties.Resources.close2;
-        }
-
         // Minimize Button
-        private void minimizeBtn_Click(object sender, EventArgs e)
+        public void minimizeBtn_Click()
         {
             this.WindowState = FormWindowState.Minimized;
         }
 
-        private void minimizeBtn_MouseEnter(object sender, EventArgs e)
-        {
-            minimizeBtn.BackgroundImage = Properties.Resources.minimize1;
-        }
-
-        private void minimizeBtn_MouseLeave(object sender, EventArgs e)
-        {
-            minimizeBtn.BackgroundImage = Properties.Resources.minimize2;
-        }
-
         public void updateStatus(string status, string colour = null)
         {
+            object[] o = new object[2];
             if (!String.IsNullOrEmpty(colour))
             {
-                object[] o = new object[2];
-                o[0] = status;
                 o[1] = colour;
-                patchNotes.Document.InvokeScript("updateStatus", o);
-            }
-            else
-            {
-                object[] o = new object[1];
-                o[0] = status;
-                patchNotes.Document.InvokeScript("updateStatus", o);
-            }
+           }
+            o[0] = status;
+            patchNotes.Document.InvokeScript("updateStatus", o);
         }
 
         public void updateFile(string file, string colour = null)
         {
-            if(!String.IsNullOrEmpty(colour))
-            {
-                object[] o = new object[2];
-                o[0] = file;
+            object[] o = new object[2];
+            if (!String.IsNullOrEmpty(colour))
+            { 
                 o[1] = colour;
-                patchNotes.Document.InvokeScript("updatefile", o);
+            }
+            o[0] = file;
+            patchNotes.Document.InvokeScript("updatefile", o);
+            
+        }
+
+        public void updateProgress(double progress, string colour = null)
+        {
+            object[] o = new object[2];
+            if (!String.IsNullOrEmpty(colour))
+            {
+                o[1] = colour;
+            }
+            o[0] = progress;
+            patchNotes.Document.InvokeScript("updateProgress", o);
+        }
+
+        public void ChooseFolder()
+        {
+            // New FolderBrowserDialog instance
+            FolderBrowserDialog Fld = new FolderBrowserDialog();
+
+            // Set initial selected folder
+            Root = this.installDirectory.Replace(@"\", @"/");
+
+            if (Directory.Exists(Root))
+            {
+                Fld.SelectedPath = Root;
             }
             else
             {
+                Fld.SelectedPath = @"C:\";
+            }
+
+            // Show the "Make new folder" button
+            Fld.ShowNewFolderButton = true;
+
+            if (Fld.ShowDialog() == DialogResult.OK)
+            {
+                // Select successful
                 object[] o = new object[1];
-                o[0] = file;
-                patchNotes.Document.InvokeScript("updatefile", o);
+                o[0] = Fld.SelectedPath;
+                patchNotes.Document.InvokeScript("fillPath", o);
             }
         }
-        
+
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
 
@@ -302,7 +305,7 @@ namespace AAF_Launcher
                     string str3 = Root + str2;
                     double percent = (double)filesDone/fileList;
                     if (Root != null)
-                    { 
+                    {
                         using (MD5.Create())
                         {
                             if (System.IO.File.Exists(Root + str2))
@@ -313,8 +316,8 @@ namespace AAF_Launcher
                                 {
                                     stream.Close();
                                     FileOperationAPIWrapper.MoveToRecycleBin(str3);
-                                    this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                                     this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
+                                    this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                                 }
                                 else
                                 {
@@ -323,10 +326,10 @@ namespace AAF_Launcher
                             }
                             else
                             {
-                                this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                                 this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
+                                this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                             }
-                        } 
+                        }
                     } 
                     filesDone++;
                     backgroundWorker1.ReportProgress((int)(percent * 710));
@@ -335,7 +338,7 @@ namespace AAF_Launcher
             if(filesDone == fileList)
             {
                 status = 10;
-                this.strtGameBtn.Text = "Launch";
+                // this.strtGameBtn.Text = "Launch";
 
             }
             else
@@ -362,6 +365,7 @@ namespace AAF_Launcher
             
             updateStatus(typer + " - " + (Math.Round((double)(percentage * 100), 2).ToString()) + "%");
             updateFile(@currentFile);
+            updateProgress(percentage);
         }
 
         public void taskBarProgress_Controller(double percentage)
@@ -403,7 +407,8 @@ namespace AAF_Launcher
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            this.strtGameBtn.Enabled = true;
+            // this.strtGameBtn.Enabled = true;
+            patchNotes.Document.InvokeScript("enableConfig");
             switch (status)
             {
                 case 1:
@@ -439,7 +444,10 @@ namespace AAF_Launcher
                 case 10:
                     updateStatus("Mods are up to date. Ready to Launch.", "100, 206, 63");
                     updateFile("");
-                    this.pictureBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(206)))), ((int)(((byte)(63))))); ;
+                    patchNotes.Document.InvokeScript("completed");
+                    //this.strtGameBtn.Click -= new System.EventHandler(this.update_Click);
+                    //.strtGameBtn.Click += new System.EventHandler(this.strtGameBtn_Click);
+                    updateProgress(1.0, "100, 206, 63");
                     break;
                 default:
                     updateStatus("Unknown Error - Code: " + status, "203, 76, 0");
@@ -448,28 +456,10 @@ namespace AAF_Launcher
         }
 
         // Starts the game
-        private void strtGameBtn_Click(object sender, EventArgs e)
+        public void strtGameBtn_Click()
         {
-            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/arma3.exe", "-nosplash -skipIntro -mod=" + getModListForGameExec());
+            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/arma3.exe", "-nosplash -skipIntro -connect=58.162.184.102 -password=diggers -port=2302 -mod=" + Util.getModListForGameExec(ModsRoot, ModsDirName));
             this.Close();
-        }
-
-        private string getModListForGameExec()
-        {
-            string stringReturn = "";
-            foreach (string subdirectoryEntries in Directory.GetDirectories(ModsRoot))
-            {
-                stringReturn += ModsDirName + "/" + subdirectoryEntries.Replace(ModsRoot, "") + ";";
-            }
-            return stringReturn;
-        }
-
-        private void pictureBox3_Click(object sender, EventArgs e)
-        {
-            backgroundWorker1.CancelAsync();
-            // this.Hide();
-            // var Form1 = new KeyForm();
-            // Form1.Show();
         }
     }
 }

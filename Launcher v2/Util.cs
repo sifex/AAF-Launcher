@@ -125,6 +125,17 @@ namespace AAF_Launcher
                 Key.Close();
             }
         }
+        
+        // Gets all the mods in the downloaded folder
+        public static string getModListForGameExec(string ModsRoot, string ModsDirName)
+        {
+            string stringReturn = "";
+            foreach (string subdirectoryEntries in Directory.GetDirectories(ModsRoot))
+            {
+                stringReturn += ModsDirName + "/" + subdirectoryEntries.Replace(ModsRoot, "") + ";";
+            }
+            return stringReturn;
+        }
 
     }
 

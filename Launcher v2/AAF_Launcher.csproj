@@ -103,6 +103,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Vendor\FileOperationAPIWrapper.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -118,14 +123,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <None Include="app.manifest">
       <SubType>Designer</SubType>
     </None>
@@ -143,14 +143,6 @@
   <ItemGroup>
     <Content Include="favicon.ico" />
     <Content Include="Resources\aaf.ico" />
-    <Content Include="Resources\bg.png" />
-    <Content Include="Resources\home_bg.png" />
-    <Content Include="Resources\logo.png" />
-    <None Include="Resources\ic_settings_48px-128.png" />
-    <None Include="Resources\minimize2.png" />
-    <None Include="Resources\minimize1.png" />
-    <None Include="Resources\close2.png" />
-    <None Include="Resources\close1.png" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
