@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Collections.Specialized;
+using System.Windows.Forms;
 
 namespace AAF_Launcher
 {
@@ -33,7 +34,15 @@ namespace AAF_Launcher
 
         public static string Request(string type = "", string method = "", string identifyer = "", string returnValue = "")
         {
-            return (new WebClient()).DownloadString(APIURL(type, method, identifyer, returnValue)).Replace(System.Environment.NewLine, "");
+            try {
+                return (new WebClient()).DownloadString(APIURL(type, method, identifyer, returnValue)).Replace(System.Environment.NewLine, "");
+            }
+            catch (Exception)
+            {
+                System.Windows.Forms.MessageBox.Show("Scarlet Servers down. Please try again later", "");
+                Environment.Exit(1);
+                return "";
+            }
         }
 
         public static byte[] PostRequest(string type = "", string method = "", string identifyer = "", string returnValue = "", NameValueCollection pairs = null)

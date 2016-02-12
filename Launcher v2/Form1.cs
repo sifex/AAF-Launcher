@@ -48,26 +48,22 @@ namespace AAF_Launcher
         
         public Form1()
         {
-            checkVersion();
-            Util.changeIEVersion(11);
-            
-            status = 2;
-
+            preStartup();
             // UI Initialize
             InitializeComponent();
             postStartup();
+        }
 
-            // Download progress
-
-            // Disable Start Game Button for now
-            // strtGameBtn.Enabled = false;
-
-            // this.strtGameBtn.Text = "Begin Update";
-            // this.strtGameBtn.Click += new System.EventHandler(this.update_Click);
+        public void preStartup()
+        {
+            checkVersion();
+            Util.changeIEVersion(11);
+            status = 2;
         }
 
         public void postStartup()
         {
+            this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/?scarletKey=" + key, System.UriKind.Absolute);
             this.patchNotes.ObjectForScripting = this;
 
             // Set Username
@@ -315,9 +311,16 @@ namespace AAF_Launcher
                                 if (!string.Equals(a, b))
                                 {
                                     stream.Close();
-                                    FileOperationAPIWrapper.MoveToRecycleBin(str3);
+                                    // FileOperationAPIWrapper.MoveToRecycleBin(str3);
                                     this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
-                                    this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
+
+                                    FileStream stream2 = System.IO.File.OpenRead(Root + str2);
+                                    string b2 = Util.HashFile(stream);
+                                    if (!string.Equals(b, a))
+                                    {
+                                        System.Windows.Forms.MessageBox.Show("Not Equal");
+                                    }
+                                    
                                 }
                                 else
                                 {
@@ -368,11 +371,52 @@ namespace AAF_Launcher
             updateProgress(percentage);
         }
 
-        public void taskBarProgress_Controller(double percentage)
+        public void downloadFile(string sSourceURL, string sDestinationPath, double percent, int fileList)
         {
-            
+            long iFileSize = 0;
+            int iBufferSize = 1024;
+            iBufferSize *= 1000;
+            long iExistLen = 0;
+            long num = 0;
+
+            System.IO.FileStream saveFileStream;
+            if (System.IO.File.Exists(sDestinationPath))
+            {
+                System.IO.FileInfo fINfo =
+                   new System.IO.FileInfo(sDestinationPath);
+                iExistLen = fINfo.Length;
+            }
+            if (iExistLen > 0)
+                saveFileStream = new System.IO.FileStream(sDestinationPath,
+                  System.IO.FileMode.Append, System.IO.FileAccess.Write,
+                  System.IO.FileShare.ReadWrite);
+            else
+                saveFileStream = new System.IO.FileStream(sDestinationPath,
+                  System.IO.FileMode.Create, System.IO.FileAccess.Write,
+                  System.IO.FileShare.ReadWrite);
+
+            System.Net.HttpWebRequest hwRq;
+            System.Net.HttpWebResponse hwRes;
+            hwRq = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(sSourceURL);
+            hwRq.AddRange((int)iExistLen);
+            System.IO.Stream smRespStream;
+            hwRes = (System.Net.HttpWebResponse)hwRq.GetResponse();
+            smRespStream = hwRes.GetResponseStream();
+
+            iFileSize = hwRes.ContentLength;
+
+            int iByteSize;
+            byte[] downBuffer = new byte[iBufferSize];
+
+            while ((iByteSize = smRespStream.Read(downBuffer, 0, downBuffer.Length)) > 0)
+            {
+                num += iByteSize;
+                saveFileStream.Write(downBuffer, 0, iByteSize);
+                this.Invoke(new Action(() => { updateStatus("Downloading Mods (" + (num / 1024 / 1024).ToString() + "MB / " + (iFileSize / 1024 / 1024).ToString() + "MB)"); }));
+            }
         }
 
+        /* 
         public void downloadFile(string sUrlToReadFileFrom, string sFilePathToWriteFileTo, double percent, int fileList)
         {
             HttpWebResponse httpWebResponse = (HttpWebResponse)WebRequest.Create(new Uri(sUrlToReadFileFrom)).GetResponse();
@@ -391,19 +435,14 @@ namespace AAF_Launcher
                         {
                             stream2.Write(buffer, 0, count);
                             num += count;
-                            backgroundWorker1.ReportProgress((int)(percent * 710));
+                            this.Invoke(new Action(() => { updateStatus("Downloading Mods (" + (num/1024/1024).ToString() + "MB / " + (contentLength/1024/1024).ToString() + "MB)"); }));
                         }
                         stream2.Close();
                     }
                     stream1.Close();
                 }
             }
-        }
-
-        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            this.pictureBox1.Size = new System.Drawing.Size(e.ProgressPercentage, 31);
-        }
+        } */
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -442,7 +481,7 @@ namespace AAF_Launcher
                     updateStatus("Error Code: 00" + status + " - " + "Failed to find ARMA 3 Directory. Looking for " + Root, "203, 76, 0");
                     break;
                 case 10:
-                    updateStatus("Mods are up to date. Ready to Launch.", "100, 206, 63");
+                     
                     updateFile("");
                     patchNotes.Document.InvokeScript("completed");
                     //this.strtGameBtn.Click -= new System.EventHandler(this.update_Click);

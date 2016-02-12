@@ -9,7 +9,7 @@ using Microsoft.Win32;
 
 namespace AAF_Launcher
 {
-    partial class Util
+    partial class Util : Form1
     {
         // Opens Existing Keyfile (if file exists)
         public static string OpenKey()
