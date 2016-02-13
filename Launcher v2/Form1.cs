@@ -178,10 +178,6 @@ namespace AAF_Launcher
             {
                 Fld.SelectedPath = Root;
             }
-            else
-            {
-                Fld.SelectedPath = @"C:\";
-            }
 
             // Show the "Make new folder" button
             Fld.ShowNewFolderButton = true;
@@ -231,6 +227,7 @@ namespace AAF_Launcher
 
             status = 5;
 
+            /* 
             /////////////////////////////////////////////////////////////////////////////////
             // Deletes all Directories other than ones that exist in the Server Repos List //
             /////////////////////////////////////////////////////////////////////////////////
@@ -275,7 +272,8 @@ namespace AAF_Launcher
             foreach (string file in Enumerable.Except<string>((IEnumerable<string>)allFiles, (IEnumerable<string>)dbFiles, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase))
             {
                 FileOperationAPIWrapper.MoveToRecycleBin(file);
-            }
+            } 
+            */
 
             status = 7;
 
@@ -307,24 +305,13 @@ namespace AAF_Launcher
                             if (System.IO.File.Exists(Root + str2))
                             {
                                 FileStream stream = System.IO.File.OpenRead(Root + str2);
+                                this.Invoke(new Action(() => { downloadLbl_Controller(percent, 1, str2); }));
                                 string b = Util.HashFile(stream);
                                 if (!string.Equals(a, b))
                                 {
-                                    stream.Close();
-                                    // FileOperationAPIWrapper.MoveToRecycleBin(str3);
-                                    this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
-
-                                    FileStream stream2 = System.IO.File.OpenRead(Root + str2);
-                                    string b2 = Util.HashFile(stream);
-                                    if (!string.Equals(b, a))
-                                    {
-                                        System.Windows.Forms.MessageBox.Show("Not Equal");
-                                    }
-                                    
-                                }
-                                else
-                                {
-                                    this.Invoke(new Action(() => { downloadLbl_Controller(percent, 1, str2); }));
+                                    FileOperationAPIWrapper.MoveToRecycleBin(str3);
+                                    downloadLbl_Controller(percent, 0, str2);
+                                    downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                                 }
                             }
                             else
@@ -333,7 +320,8 @@ namespace AAF_Launcher
                                 this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                             }
                         }
-                    } 
+                    }
+
                     filesDone++;
                     backgroundWorker1.ReportProgress((int)(percent * 710));
                 }
@@ -341,14 +329,14 @@ namespace AAF_Launcher
             if(filesDone == fileList)
             {
                 status = 10;
-                // this.strtGameBtn.Text = "Launch";
-
             }
             else
             {
                 status = 9;
             }
         }
+
+        public void verifyFiles() { }
 
         public void downloadLbl_Controller(double percentage, int type, string currentFile)
         {
@@ -371,7 +359,7 @@ namespace AAF_Launcher
             updateProgress(percentage);
         }
 
-        public void downloadFile(string sSourceURL, string sDestinationPath, double percent, int fileList)
+        /* public void downloadFile(string sSourceURL, string sDestinationPath, double percent, int fileList)
         {
             long iFileSize = 0;
             int iBufferSize = 1024;
@@ -387,13 +375,17 @@ namespace AAF_Launcher
                 iExistLen = fINfo.Length;
             }
             if (iExistLen > 0)
-                saveFileStream = new System.IO.FileStream(sDestinationPath,
+            {
+                 saveFileStream = new System.IO.FileStream(sDestinationPath,
                   System.IO.FileMode.Append, System.IO.FileAccess.Write,
                   System.IO.FileShare.ReadWrite);
+            }
             else
+            {
                 saveFileStream = new System.IO.FileStream(sDestinationPath,
                   System.IO.FileMode.Create, System.IO.FileAccess.Write,
                   System.IO.FileShare.ReadWrite);
+            }
 
             System.Net.HttpWebRequest hwRq;
             System.Net.HttpWebResponse hwRes;
@@ -412,11 +404,11 @@ namespace AAF_Launcher
             {
                 num += iByteSize;
                 saveFileStream.Write(downBuffer, 0, iByteSize);
-                this.Invoke(new Action(() => { updateStatus("Downloading Mods (" + (num / 1024 / 1024).ToString() + "MB / " + (iFileSize / 1024 / 1024).ToString() + "MB)"); }));
+                updateStatus("Downloading Mods (" + ((iExistLen + num) / 1024).ToString("N0") + " KB / " + ((iExistLen + iFileSize) / 1024).ToString("N0") + " KB)");
             }
-        }
+        } */
 
-        /* 
+        
         public void downloadFile(string sUrlToReadFileFrom, string sFilePathToWriteFileTo, double percent, int fileList)
         {
             HttpWebResponse httpWebResponse = (HttpWebResponse)WebRequest.Create(new Uri(sUrlToReadFileFrom)).GetResponse();
@@ -435,14 +427,14 @@ namespace AAF_Launcher
                         {
                             stream2.Write(buffer, 0, count);
                             num += count;
-                            this.Invoke(new Action(() => { updateStatus("Downloading Mods (" + (num/1024/1024).ToString() + "MB / " + (contentLength/1024/1024).ToString() + "MB)"); }));
+                            this.Invoke(new Action(() => { updateStatus("Downloading Mods (" + (num/1024).ToString("N0") + " KB / " + (contentLength/1024).ToString("N0") + " KB)"); }));
                         }
                         stream2.Close();
                     }
                     stream1.Close();
                 }
             }
-        } */
+        } 
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
