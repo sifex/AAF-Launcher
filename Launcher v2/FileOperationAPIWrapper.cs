@@ -129,7 +129,6 @@ namespace AAF_Launcher
         public static bool MoveToRecycleBin(string path)
         {
             return Send(path, FileOperationFlags.FOF_NOCONFIRMATION | FileOperationFlags.FOF_NOERRORUI | FileOperationFlags.FOF_SILENT);
-
         }
 
         private static bool deleteFile(string path, FileOperationFlags flags)

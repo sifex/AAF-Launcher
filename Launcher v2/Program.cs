@@ -8,7 +8,6 @@ namespace AAF_Launcher
 {
     static class Program
     {
-        public static string ScarletAPI = "http://scarlet.australianarmedforces.org/";
         [STAThread]
         static void Main()
         {
@@ -16,8 +15,5 @@ namespace AAF_Launcher
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
         }
-        
-        
-
     }
 }

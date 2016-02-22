@@ -40,7 +40,6 @@ namespace AAF_Launcher
             catch (Exception)
             {
                 System.Windows.Forms.MessageBox.Show("Scarlet Servers down. Please try again later", "");
-                Environment.Exit(1);
                 return "";
             }
         }

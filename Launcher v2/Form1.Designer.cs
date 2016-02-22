@@ -44,10 +44,7 @@ namespace AAF_Launcher
             // 
             // patchNotes
             // 
-            this.patchNotes.AllowWebBrowserDrop = false;
-            this.patchNotes.CausesValidation = false;
             this.patchNotes.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.patchNotes.IsWebBrowserContextMenuEnabled = false;
             this.patchNotes.Location = new System.Drawing.Point(0, 0);
             this.patchNotes.MinimumSize = new System.Drawing.Size(20, 20);
             this.patchNotes.Name = "patchNotes";
@@ -71,7 +68,6 @@ namespace AAF_Launcher
             this.ForeColor = System.Drawing.Color.White;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.Name = "Form1";
             this.Text = "AAF Updater";
             this.ResumeLayout(false);

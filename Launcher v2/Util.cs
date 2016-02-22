@@ -14,36 +14,77 @@ namespace AAF_Launcher
         // Opens Existing Keyfile (if file exists)
         public static string OpenKey()
         {
-            // Grab Steam Location
-            String Root = (string)Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", null);
-            String Key;
-            if (Root == null)
+            string key;
+            
+            // The folder for the roaming current user 
+            string folder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+            // Combine the base folder with your specific folder....
+            string specificFolder = folder + "/scarlet";
+
+            // Check if folder exists and if not, create it
+            if (Directory.Exists(specificFolder))
             {
-                return "";
-            }
-            else
-            {
-                // Append Arma 3 Location
-                Root = Root + "/steamapps/common/Arma 3";
-                if (File.Exists(Root + @"/scarlet_config.cfg"))
+                if (File.Exists(specificFolder + @"/scarlet_config.cfg"))
                 {
-                    Key = File.ReadAllText(Root + @"/scarlet_config.cfg").Replace(System.Environment.NewLine, "");
+                    key = File.ReadAllText(specificFolder + @"/scarlet_config.cfg").Replace(System.Environment.NewLine, "");
+                    
+                    if (API.Request("user", "info", key, "id") == "")
+                    {
+                        return "invalid";
+                    }
+                    else
+                    {
+                        return key;
+                    }
+
                 }
                 else
                 {
-                    return "";
+                    return "nokey";
                 }
-            }
-
-            if (API.Request("user", "info", Key, "id") == "")
-            {
-                return "invalid";
             }
             else
             {
-                return Key;
+                return "nokey";
             }
 
+        }
+
+        public static bool SaveKey(string key)
+        {
+
+            // The folder for the roaming current user 
+            string folder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+            // Combine the base folder with your specific folder....
+            string specificFolder = folder + "/scarlet";
+
+            // Check if folder exists and if not, create it
+            if (!Directory.Exists(specificFolder))
+            {
+                Directory.CreateDirectory(specificFolder);
+            }
+
+
+            if (string.Equals(API.Request("user", "info", key, "id"), ""))
+            {
+                return false;
+            }
+            else
+            {
+                // Compose a string that consists of three lines.
+                string lines = key;
+
+                // Write the string to a file.
+                System.IO.StreamWriter file = new System.IO.StreamWriter(specificFolder + "/scarlet_config.cfg");
+                file.WriteLine(lines);
+
+                file.Close();
+                return true;
+            }
+
+            
         }
         
         // First Character to Uppercase

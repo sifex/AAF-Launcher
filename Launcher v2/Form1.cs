@@ -26,14 +26,14 @@ namespace AAF_Launcher
         // Set Server Variable. This should be where index.php, html and the mods folder should be.
         public string Server = "http://mods.australianarmedforces.org/";
         public string ScarletAPI = "http://scarlet.australianarmedforces.org/";
-        public string Version = "0.7beta";
+        public string Version = "0.7release";
         public int status = 1;
         public string ModsDirName;
         public string ModsRoot;
         public string Root;
-        public string key = Util.OpenKey();
-        public string Username = API.Request("user", "info", Util.OpenKey(), "username");
-        public string installDirectory = API.Request("user", "install", Util.OpenKey());
+        public string key;
+        public string Username;
+        public string installDirectory;
 
         public bool WorkerSupportsCancellation = true;
         public const int WM_NCLBUTTONDOWN = 161;
@@ -48,33 +48,64 @@ namespace AAF_Launcher
         
         public Form1()
         {
+            // Prep for Startup
             preStartup();
+
             // UI Initialize
             InitializeComponent();
+
+            // Post for Startup (UI Configuration)
             postStartup();
         }
 
         public void preStartup()
         {
+
+            this.key = Util.OpenKey();
+
+            if (key == "nokey")
+            {
+                this.Username = "needskey1827129361";
+            }
+            else
+            {
+                this.Username = API.Request("user", "info", key, "username");
+                this.installDirectory = API.Request("user", "install", key);
+            }
             checkVersion();
-            Util.changeIEVersion(11);
+            // Util.changeIEVersion(11);
             status = 2;
+        }
+
+        public void saveKeyAndRestart(string input)
+        {
+            if(Util.SaveKey(input) == true)
+            {
+                this.key = Util.OpenKey();
+                this.Username = API.Request("user", "info", key, "username");
+                this.installDirectory = API.Request("user", "install", key);
+                
+                this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/?scarletKey=" + key, System.UriKind.Absolute);
+            }
         }
 
         public void postStartup()
         {
-            this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/?scarletKey=" + key, System.UriKind.Absolute);
+            if(Username == "needskey1827129361")
+            {
+                this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/?scarletKey=" + key, System.UriKind.Absolute);
+            }
             this.patchNotes.ObjectForScripting = this;
-
-            // Set Username
-            Username = API.Request("user", "info", key, "username");
             this.patchNotes.Refresh(WebBrowserRefreshOption.Completely);
         }
 
         private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
-            updateStatus("Hi " + Util.FirstCharToUpper(Username) + ".", "33, 153, 232");
-            updateFile("Current Install Directory is: " + installDirectory, "74, 105, 136");
+            if(this.patchNotes.Url  == new System.Uri("http://mods.australianarmedforces.org/html/?scarletKey=" + key, System.UriKind.Absolute))
+            {
+                updateStatus("Hi " + Util.FirstCharToUpper(Username) + ".", "33, 153, 232");
+                updateFile("Current Install Directory is: " + installDirectory, "74, 105, 136");
+            }
         }
 
         // On Update Button Click
@@ -171,14 +202,6 @@ namespace AAF_Launcher
             // New FolderBrowserDialog instance
             FolderBrowserDialog Fld = new FolderBrowserDialog();
 
-            // Set initial selected folder
-            Root = this.installDirectory.Replace(@"\", @"/");
-
-            if (Directory.Exists(Root))
-            {
-                Fld.SelectedPath = Root;
-            }
-
             // Show the "Make new folder" button
             Fld.ShowNewFolderButton = true;
 
@@ -227,7 +250,7 @@ namespace AAF_Launcher
 
             status = 5;
 
-            /* 
+            
             /////////////////////////////////////////////////////////////////////////////////
             // Deletes all Directories other than ones that exist in the Server Repos List //
             /////////////////////////////////////////////////////////////////////////////////
@@ -273,7 +296,7 @@ namespace AAF_Launcher
             {
                 FileOperationAPIWrapper.MoveToRecycleBin(file);
             } 
-            */
+            
 
             status = 7;
 
@@ -473,7 +496,7 @@ namespace AAF_Launcher
                     updateStatus("Error Code: 00" + status + " - " + "Failed to find ARMA 3 Directory. Looking for " + Root, "203, 76, 0");
                     break;
                 case 10:
-                     
+                    updateStatus("Mods are up to date. Ready to Launch.", "100, 206, 63");
                     updateFile("");
                     patchNotes.Document.InvokeScript("completed");
                     //this.strtGameBtn.Click -= new System.EventHandler(this.update_Click);
@@ -489,7 +512,7 @@ namespace AAF_Launcher
         // Starts the game
         public void strtGameBtn_Click()
         {
-            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/arma3.exe", "-nosplash -skipIntro -connect=58.162.184.102 -password=diggers -port=2302 -mod=" + Util.getModListForGameExec(ModsRoot, ModsDirName));
+            // Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/arma3.exe", "-nosplash -skipIntro -connect=58.162.184.102 -password=diggers -port=2302 -mod=" + Util.getModListForGameExec(ModsRoot, ModsDirName));
             this.Close();
         }
     }
