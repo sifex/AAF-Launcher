@@ -61,7 +61,7 @@ namespace AAF_Launcher
         public void preStartup()
         {
 
-            this.key = Util.OpenKey();
+            this.key = "42de65d777b8bcb2a2cf5396c87f8508";
 
             if (key == "nokey")
             {
@@ -91,10 +91,8 @@ namespace AAF_Launcher
 
         public void postStartup()
         {
-            if(Username == "needskey1827129361")
-            {
                 this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/?scarletKey=" + key, System.UriKind.Absolute);
-            }
+            
             this.patchNotes.ObjectForScripting = this;
             this.patchNotes.Refresh(WebBrowserRefreshOption.Completely);
         }
