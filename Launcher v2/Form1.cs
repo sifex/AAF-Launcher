@@ -61,7 +61,7 @@ namespace AAF_Launcher
         public void preStartup()
         {
 
-            this.key = "42de65d777b8bcb2a2cf5396c87f8508";
+            this.key = Util.OpenKey();
 
             if (key == "nokey")
             {
@@ -91,9 +91,15 @@ namespace AAF_Launcher
 
         public void postStartup()
         {
-            
-            this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/?scarletKey=" + key, System.UriKind.Absolute);
-            
+            if(key == "nokey")
+            {
+                this.patchNotes.Url = new System.Uri("http://scarlet.australianarmedforces.org/key/?authKey=" + key, System.UriKind.Absolute);
+            }
+            else
+            {
+                this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/?scarletKey=" + key, System.UriKind.Absolute);
+            }
+
             this.patchNotes.ObjectForScripting = this;
             this.patchNotes.Refresh(WebBrowserRefreshOption.Completely);
         }
@@ -326,13 +332,13 @@ namespace AAF_Launcher
                         {
                             if (System.IO.File.Exists(Root + str2))
                             {
-                                FileStream stream = System.IO.File.OpenRead(Root + str2);
                                 this.Invoke(new Action(() => { downloadLbl_Controller(percent, 1, str2); }));
+                                FileStream stream = System.IO.File.OpenRead(Root + str2);
                                 string b = Util.HashFile(stream);
                                 stream.Close();
                                 if (!string.Equals(a, b))
                                 {
-                                    
+                                    File.Delete(str3);
                                     this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
                                     downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                                 }
@@ -442,10 +448,6 @@ namespace AAF_Launcher
             {
                 using (Stream stream1 = webClient.OpenRead(new Uri(sUrlToReadFileFrom)))
                 {
-                    if(File.Exists(sFilePathToWriteFileTo))
-                    {
-                        File.Delete(sFilePathToWriteFileTo);
-                    }
                     using (Stream stream2 = new FileStream(sFilePathToWriteFileTo, FileMode.Create, FileAccess.Write, FileShare.None))
                     {
                         byte[] buffer = new byte[contentLength];
