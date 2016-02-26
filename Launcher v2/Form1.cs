@@ -75,14 +75,22 @@ namespace AAF_Launcher
             {
                 Util.DeleteKey();
             }
+            catch(FileNotFoundException)
+            {
+                this.Username = "";
+                this.installDirectory = "";
+                return;
+            }
 
-           
-            this.Username = API.Request("user", "info", key, "username");
-            this.installDirectory = API.Request("user", "install", key);
-            
-            checkVersion();
-            Util.changeIEVersion(11);
-            status = 2;
+           if(key != null)
+            {
+                this.Username = API.Request("user", "info", key, "username");
+                this.installDirectory = API.Request("user", "install", key);
+
+                checkVersion();
+                Util.changeIEVersion(11);
+                status = 2;
+            }
         }
 
         public void saveKeyAndRestart(string input)
@@ -99,7 +107,7 @@ namespace AAF_Launcher
 
         public void postStartup()
         {
-            if(key == "nokey")
+            if(key == null)
             {
                 this.patchNotes.Url = new System.Uri("http://scarlet.australianarmedforces.org/key/?authKey=" + key, System.UriKind.Absolute);
             }
@@ -469,7 +477,11 @@ namespace AAF_Launcher
                         {
                             stream2.Write(buffer, 0, count);
                             num += count;
-                            this.Invoke(new Action(() => { updateStatus("Downloading Mods (" + (num/1024).ToString("N0") + " KB / " + (contentLength/1024).ToString("N0") + " KB)"); }));
+                            try { this.Invoke(new Action(() => { updateStatus("Downloading Mods (" + (num / 1024).ToString("N0") + " KB / " + (contentLength / 1024).ToString("N0") + " KB)"); })); }
+                            catch(System.InvalidOperationException)
+                            {
+
+                            }
                         }
                         stream2.Close();
                     }
