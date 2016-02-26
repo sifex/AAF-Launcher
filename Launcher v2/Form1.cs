@@ -127,14 +127,22 @@ namespace AAF_Launcher
         public void checkVersion()
         {
             var versionURL = Server + "version.txt";
-            var versionNo = (new WebClient()).DownloadString(versionURL);
 
-            if(versionNo != Version)
-            {
-                System.Windows.Forms.MessageBox.Show("This version is out of date, please download the updated version.");
-                Process.Start("http://mods.australianarmedforces.org/?update");
-                Environment.Exit(0);
+            try { 
+                var versionNo = (new WebClient()).DownloadString(versionURL);
+                if (versionNo != Version)
+                {
+                    System.Windows.Forms.MessageBox.Show("This version is out of date, please download the updated version.");
+                    Process.Start("http://mods.australianarmedforces.org/?update");
+                    Environment.Exit(0);
+                }
             }
+            catch(System.Net.WebException)
+            {
+
+            }
+
+            
         }
 
         public void openURL(string URL)
@@ -255,7 +263,6 @@ namespace AAF_Launcher
 
             status = 5;
 
-            
             /////////////////////////////////////////////////////////////////////////////////
             // Deletes all Directories other than ones that exist in the Server Repos List //
             /////////////////////////////////////////////////////////////////////////////////
@@ -467,7 +474,6 @@ namespace AAF_Launcher
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            // this.strtGameBtn.Enabled = true;
             patchNotes.Document.InvokeScript("enableConfig");
             switch (status)
             {
@@ -505,8 +511,7 @@ namespace AAF_Launcher
                     updateStatus("Mods are up to date. Ready to Launch.", "100, 206, 63");
                     updateFile("");
                     patchNotes.Document.InvokeScript("completed");
-                    //this.strtGameBtn.Click -= new System.EventHandler(this.update_Click);
-                    //.strtGameBtn.Click += new System.EventHandler(this.strtGameBtn_Click);
+
                     updateProgress(1.0, "100, 206, 63");
                     break;
                 default:
@@ -518,7 +523,7 @@ namespace AAF_Launcher
         // Starts the game
         public void strtGameBtn_Click()
         {
-            // Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/arma3.exe", "-nosplash -skipIntro -connect=58.162.184.102 -password=diggers -port=2302 -mod=" + Util.getModListForGameExec(ModsRoot, ModsDirName));
+            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/arma3.exe", "-nosplash -skipIntro -connect=58.162.184.102 -password=diggers -port=2302 -mod=" + Util.getModListForGameExec(ModsRoot, ModsDirName));
             this.Close();
         }
     }
