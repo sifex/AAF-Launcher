@@ -39,8 +39,7 @@ namespace AAF_Launcher
             }
             catch (Exception)
             {
-                System.Windows.Forms.MessageBox.Show("Scarlet Servers down. Please try again later", "");
-                return "";
+                throw new WebException("Unable to connect to Scarlet Servers. Please try again later.");
             }
         }
 

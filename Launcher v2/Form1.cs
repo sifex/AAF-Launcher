@@ -61,13 +61,25 @@ namespace AAF_Launcher
         public void preStartup()
         {
 
-            this.key = Util.OpenKey();
-
-            if (key != "nokey")
+            // Test Connection
+            try { API.Request(""); }
+            catch(Exception ex)
             {
-                this.Username = API.Request("user", "info", key, "username");
-                this.installDirectory = API.Request("user", "install", key);
+                System.Windows.Forms.MessageBox.Show(ex.Message.ToString(), "No connection to Scarlet Servers.");
+                Environment.Exit(1);
             }
+
+            // Set Key Variable
+            try { this.key = Util.OpenKey(); }
+            catch(WebException)
+            {
+                Util.DeleteKey();
+            }
+
+           
+            this.Username = API.Request("user", "info", key, "username");
+            this.installDirectory = API.Request("user", "install", key);
+            
             checkVersion();
             Util.changeIEVersion(11);
             status = 2;
@@ -123,22 +135,20 @@ namespace AAF_Launcher
         public void checkVersion()
         {
             var versionURL = Server + "version.txt";
-
+            var versionNo = "";
             try { 
-                var versionNo = (new WebClient()).DownloadString(versionURL);
-                if (versionNo != Version)
-                {
-                    System.Windows.Forms.MessageBox.Show("This version is out of date, please download the updated version.");
-                    Process.Start("http://mods.australianarmedforces.org/?update");
-                    Environment.Exit(0);
-                }
+                versionNo = (new WebClient()).DownloadString(versionURL);
             }
             catch(System.Net.WebException)
             {
 
             }
-
-            
+            if (versionNo != Version)
+            {
+                System.Windows.Forms.MessageBox.Show("This version is out of date, please download the updated version.");
+                Process.Start("http://mods.australianarmedforces.org/?update");
+                Environment.Exit(0);
+            }
         }
 
         public void openURL(string URL)

@@ -31,7 +31,7 @@ namespace AAF_Launcher
                     
                     if (API.Request("user", "info", key, "id") == "")
                     {
-                        return "invalid";
+                        throw new WebException("Key doesn't exist in Scarlet Database");
                     }
                     else
                     {
@@ -41,16 +41,17 @@ namespace AAF_Launcher
                 }
                 else
                 {
-                    return "nokey";
+                    throw new FileNotFoundException("No Key Found");
                 }
             }
             else
             {
-                return "nokey";
+                throw new FileNotFoundException("No Key Found");
             }
 
         }
 
+        // Saves Key to App File
         public static bool SaveKey(string key)
         {
 
@@ -85,6 +86,18 @@ namespace AAF_Launcher
             }
 
             
+        }
+
+        // Saves Key to App File
+        public static void DeleteKey()
+        {
+            // The folder for the roaming current user 
+            string folder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+            // Combine the base folder with your specific folder....
+            string specificFolder = folder + "/scarlet";
+
+            File.Delete(specificFolder + "/scarlet_config.cfg");
         }
         
         // First Character to Uppercase
