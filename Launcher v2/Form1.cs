@@ -63,17 +63,13 @@ namespace AAF_Launcher
 
             this.key = Util.OpenKey();
 
-            if (key == "nokey")
-            {
-                this.Username = "needskey1827129361";
-            }
-            else
+            if (key != "nokey")
             {
                 this.Username = API.Request("user", "info", key, "username");
                 this.installDirectory = API.Request("user", "install", key);
             }
             checkVersion();
-            // Util.changeIEVersion(11);
+            Util.changeIEVersion(11);
             status = 2;
         }
 
