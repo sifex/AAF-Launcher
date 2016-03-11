@@ -23,11 +23,20 @@ namespace AAF_Launcher
     [System.Runtime.InteropServices.ComVisibleAttribute(true)]
     public partial class Form1 : Form
     {
-        // Set Server Variable. This should be where index.php, html and the mods folder should be.
-        public string Server = "http://mods.australianarmedforces.org/";
+        // Scarlet Variables
         public string ScarletAPI = "http://scarlet.australianarmedforces.org/";
-        public string Version = "0.7release";
+        public string Version = "0.8";
+
+        // Change status codes to exceptions!
         public int status = 1;
+
+        // Set Application Variables
+        public bool noKey = false;
+
+        // Set as ClanAPI -> URL -> (User API -> Key -> Clanid)
+        public string Server;
+        public string ServerRepo;
+        public string clanID;
         public string ModsDirName;
         public string ModsRoot;
         public string Root;
@@ -40,8 +49,7 @@ namespace AAF_Launcher
         public const int HT_CAPTION = 2;
 
         [DllImportAttribute("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd,
-                         int Msg, int wParam, int lParam);
+        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
 
         [DllImportAttribute("user32.dll")]
         public static extern bool ReleaseCapture();
@@ -60,36 +68,84 @@ namespace AAF_Launcher
 
         public void preStartup()
         {
+            //  Test Connection to API Scarlet Servers 
+            //      Does:       Sends a blank API Request to the Scarlet Servers
+            //      Returns:    void or Application Exit
+            testConnection();
+            
+            //  Check's Application Version
+            //      Does:       Downloads and reads version.txt, compares with imbedded version string
+            //      Returns:    void or Application Exit
+            checkVersion();
 
-            // Test Connection
+            //  Scarlet Key Controller
+            //      Does:       Sets key to the existing key file, deletes if doesn't exist.
+            //      Returns:    void
+            //      $Key:       Set to the Users Key
+            //      $noKey:     Set if Util.OpenKey() returns a FileNotFoundException      
+            scarletKeyController();
+            
+            //  Sets all the variables for the application if noKey hasn't been triggered
+            if(noKey == false)
+            {
+                this.clanID = API.Request("user", "info", key, "clanid");
+                this.Username = API.Request("user", "info", key, "username");
+                this.installDirectory = API.Request("user", "info", key, "installDir");
+                this.Server = "http://mods.australianarmedforces.org/clans/" + clanID + "";
+                this.ServerRepo = Server + "/repo/";
+            }
+
+            // Change IE Version
+            Util.changeIEVersion(11);
+        }
+
+        // Check Current version on Server
+        public void testConnection()
+        {
             try { API.Request(""); }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 System.Windows.Forms.MessageBox.Show(ex.Message.ToString(), "No connection to Scarlet Servers.");
                 Environment.Exit(1);
             }
+        }
 
-            // Set Key Variable
-            try { this.key = Util.OpenKey(); }
-            catch(WebException)
+        // Check Current version on Server
+        public void checkVersion()
+        {
+            var versionURL = Server + "version.txt";
+            var versionNo = "";
+            try
+            {
+                versionNo = (new WebClient()).DownloadString(versionURL);
+            }
+            catch (System.Net.WebException)
+            {
+
+            }
+            if (versionNo != Version)
+            {
+                System.Windows.Forms.MessageBox.Show("This version is out of date, please download the updated version.");
+                Process.Start("http://mods.australianarmedforces.org/?update");
+                Environment.Exit(0);
+            }
+        }
+
+        // Checks and assigns the key to whatevers in the key file & checks validity
+        public void scarletKeyController()
+        {
+            try
+            {
+                this.key = Util.OpenKey();
+            }
+            catch (WebException)
             {
                 Util.DeleteKey();
             }
-            catch(FileNotFoundException)
+            catch (FileNotFoundException)
             {
-                this.Username = "";
-                this.installDirectory = "";
+                noKey = true;
                 return;
-            }
-
-           if(key != null)
-            {
-                this.Username = API.Request("user", "info", key, "username");
-                this.installDirectory = API.Request("user", "install", key);
-
-                checkVersion();
-                Util.changeIEVersion(11);
-                status = 2;
             }
         }
 
@@ -109,11 +165,11 @@ namespace AAF_Launcher
         {
             if(key == null)
             {
-                this.patchNotes.Url = new System.Uri("http://scarlet.australianarmedforces.org/key/?authKey=" + key, System.UriKind.Absolute);
+                this.patchNotes.Url = new System.Uri(ScarletAPI + "/key/?authKey=" + key, System.UriKind.Absolute);
             }
             else
             {
-                this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/?scarletKey=" + key, System.UriKind.Absolute);
+                this.patchNotes.Url = new System.Uri(Server + "/html/?scarletKey=" + key, System.UriKind.Absolute);
             }
 
             this.patchNotes.ObjectForScripting = this;
@@ -122,7 +178,7 @@ namespace AAF_Launcher
 
         private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
-            if(this.patchNotes.Url  == new System.Uri("http://mods.australianarmedforces.org/html/?scarletKey=" + key, System.UriKind.Absolute))
+            if(this.patchNotes.Url  == new System.Uri(Server + "/html/?scarletKey=" + key, System.UriKind.Absolute))
             {
                 updateStatus("Hi " + Util.FirstCharToUpper(Username) + ".", "33, 153, 232");
                 updateFile("Current Install Directory is: " + installDirectory, "74, 105, 136");
@@ -139,26 +195,6 @@ namespace AAF_Launcher
             // this.strtGameBtn.Enabled = false;
         }
 
-        // Check Current version on Server
-        public void checkVersion()
-        {
-            var versionURL = Server + "version.txt";
-            var versionNo = "";
-            try { 
-                versionNo = (new WebClient()).DownloadString(versionURL);
-            }
-            catch(System.Net.WebException)
-            {
-
-            }
-            if (versionNo != Version)
-            {
-                System.Windows.Forms.MessageBox.Show("This version is out of date, please download the updated version.");
-                Process.Start("http://mods.australianarmedforces.org/?update");
-                Environment.Exit(0);
-            }
-        }
-
         public void openURL(string URL)
         {
             Process.Start(URL);
@@ -167,7 +203,7 @@ namespace AAF_Launcher
         // Makes the main window (Form1) dragable
         public void refreshStatus()
         {
-            installDirectory = API.Request("user", "install", Util.OpenKey());
+            installDirectory = API.Request("user", "info", key, "installDir");
             updateStatus("Hi " + Util.FirstCharToUpper(Username) + ".", "33, 153, 232");
             updateFile("Current Install Directory is: " + installDirectory, "74, 105, 136");
         }
@@ -236,7 +272,7 @@ namespace AAF_Launcher
             {
                 // Select successful
                 object[] o = new object[1];
-                o[0] = Fld.SelectedPath;
+                o[0] = Fld.SelectedPath + "";
                 patchNotes.Document.InvokeScript("fillPath", o);
             }
         }
@@ -255,7 +291,7 @@ namespace AAF_Launcher
             status = 8;
 
             // Loads Server Repos XML
-            XDocument xmlRepo = XDocument.Load(this.Server + "/repo.xml");
+            XDocument xmlRepo = XDocument.Load(this.ServerRepo + "/main/repo.xml");
             
             // Fetches ModRoot Directory from Server, or Defaults to /Server_Mods/
             // Don't use /Mods/ as a folder as your clan will bug you to ask where their custom 1337 mods have gone! 
@@ -344,7 +380,7 @@ namespace AAF_Launcher
                 {
                     string str2 = xelement.Element("name").Value;
                     string a = xelement.Element("hash").Value;
-                    string sUrlToReadFileFrom = this.Server + str2;
+                    string sUrlToReadFileFrom = this.ServerRepo + "/main/" + str2;
                     string str3 = Root + str2;
                     double percent = (double)filesDone/fileList;
                     if (Root != null)
