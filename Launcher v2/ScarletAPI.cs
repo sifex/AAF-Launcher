@@ -3,15 +3,15 @@ using System.Net;
 using System.Collections.Specialized;
 using System.Windows.Forms;
 
-namespace AAF_Launcher
+namespace Scarlet
 {
-    public static class API
+    public static class ScarletAPI
     {
-        public static string ScarletAPI = "http://scarlet.australianarmedforces.org/";
+        public static string ScarletURL = "http://scarlet.australianarmedforces.org/";
 
         public static string APIURL(string type = "", string method = "", string identifyer = "", string returnValue = "")
         {
-            var apiURL = (ScarletAPI + @"api");
+            var apiURL = (ScarletURL + @"api");
             if (type != "")
             {
                 apiURL += "/" + type;

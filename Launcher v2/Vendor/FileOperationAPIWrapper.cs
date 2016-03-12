@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AAF_Launcher
+namespace Vendor
 {
     using System.Runtime.InteropServices;
 

@@ -7,10 +7,10 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("AAF Launcher")]
-[assembly: AssemblyDescription("Updater & Launcher for the ARMA 3 Modding Platform - Australian Armed Forces")]
+[assembly: AssemblyDescription("Scarlet Updater Platform for the ARMA 3 Modding Platform")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Australian Armed Forces")]
-[assembly: AssemblyProduct("AAF Updater")]
+[assembly: AssemblyProduct("Scarlet Updater Platform")]
 [assembly: AssemblyCopyright("Copyright © 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

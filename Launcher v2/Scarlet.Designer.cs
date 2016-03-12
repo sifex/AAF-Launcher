@@ -1,8 +1,8 @@
 ﻿
 
-namespace AAF_Launcher
+namespace Scarlet
 {
-    public partial class Form1
+    public partial class Scarlet
     {
         /// <summary>
         /// Required designer variable.
@@ -30,7 +30,7 @@ namespace AAF_Launcher
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Scarlet));
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.patchNotes = new System.Windows.Forms.WebBrowser();
             this.SuspendLayout();
@@ -41,6 +41,7 @@ namespace AAF_Launcher
             this.backgroundWorker1.WorkerSupportsCancellation = true;
             this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
             this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
+
             // 
             // patchNotes
             // 
@@ -52,6 +53,7 @@ namespace AAF_Launcher
             this.patchNotes.Size = new System.Drawing.Size(900, 450);
             this.patchNotes.TabIndex = 5;
             this.patchNotes.TabStop = false;
+            this.patchNotes.Url = new System.Uri("http://google.com.au/", System.UriKind.Absolute);
             this.patchNotes.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
             // 
             // Form1

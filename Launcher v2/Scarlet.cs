@@ -18,13 +18,11 @@ using Microsoft.VisualBasic;
 using System.Windows;
 using System.Security.Permissions;
 
-namespace AAF_Launcher
+namespace Scarlet
 {
     [System.Runtime.InteropServices.ComVisibleAttribute(true)]
-    public partial class Form1 : Form
+    public partial class Scarlet : Form
     {
-        // Scarlet Variables
-        public string ScarletAPI = "http://scarlet.australianarmedforces.org/";
         public string Version = "0.8";
 
         // Change status codes to exceptions!
@@ -36,7 +34,7 @@ namespace AAF_Launcher
         // Set as ClanAPI -> URL -> (User API -> Key -> Clanid)
         public string Server;
         public string ServerRepo;
-        public string clanID;
+        public string ClanID;
         public string ModsDirName;
         public string ModsRoot;
         public string Root;
@@ -54,7 +52,7 @@ namespace AAF_Launcher
         [DllImportAttribute("user32.dll")]
         public static extern bool ReleaseCapture();
         
-        public Form1()
+        public Scarlet()
         {
             // Prep for Startup
             preStartup();
@@ -71,101 +69,46 @@ namespace AAF_Launcher
             //  Test Connection to API Scarlet Servers 
             //      Does:       Sends a blank API Request to the Scarlet Servers
             //      Returns:    void or Application Exit
-            testConnection();
-            
+            ScarletUtil.testConnection();
+
             //  Check's Application Version
             //      Does:       Downloads and reads version.txt, compares with imbedded version string
             //      Returns:    void or Application Exit
-            checkVersion();
+            ScarletUtil.checkVersion(Version);
 
             //  Scarlet Key Controller
             //      Does:       Sets key to the existing key file, deletes if doesn't exist.
             //      Returns:    void
             //      $Key:       Set to the Users Key
             //      $noKey:     Set if Util.OpenKey() returns a FileNotFoundException      
-            scarletKeyController();
-            
+            // scarletKeyController();
+
             //  Sets all the variables for the application if noKey hasn't been triggered
-            if(noKey == false)
+            /* if(noKey == false)
             {
-                this.clanID = API.Request("user", "info", key, "clanid");
-                this.Username = API.Request("user", "info", key, "username");
-                this.installDirectory = API.Request("user", "info", key, "installDir");
-                this.Server = "http://mods.australianarmedforces.org/clans/" + clanID + "";
+                this.ClanID = ScarletAPI.Request("user", "info", key, "clanid");
+                this.Username = ScarletAPI.Request("user", "info", key, "username");
+                this.installDirectory = ScarletAPI.Request("user", "info", key, "installDir");
+                this.Server = "http://mods.australianarmedforces.org/clans/" + ClanID + "";
                 this.ServerRepo = Server + "/repo/";
-            }
+            } */
 
             // Change IE Version
-            Util.changeIEVersion(11);
-        }
 
-        // Check Current version on Server
-        public void testConnection()
-        {
-            try { API.Request(""); }
-            catch (Exception ex)
-            {
-                System.Windows.Forms.MessageBox.Show(ex.Message.ToString(), "No connection to Scarlet Servers.");
-                Environment.Exit(1);
-            }
-        }
 
-        // Check Current version on Server
-        public void checkVersion()
-        {
-            var versionURL = "http://mods.australianarmedforces.org/version.txt";
-            var versionNo = "";
-            try
-            {
-                versionNo = (new WebClient()).DownloadString(versionURL);
-            }
-            catch (System.Net.WebException)
-            {
-
-            }
-            if (versionNo != Version)
-            {
-                System.Windows.Forms.MessageBox.Show("This version is out of date, please download the updated version.");
-                Process.Start("http://mods.australianarmedforces.org/?update");
-                Environment.Exit(0);
-            }
-        }
-
-        // Checks and assigns the key to whatevers in the key file & checks validity
-        public void scarletKeyController()
-        {
-            try
-            {
-                this.key = Util.OpenKey();
-            }
-            catch (WebException)
-            {
-                Util.DeleteKey();
-            }
-            catch (FileNotFoundException)
-            {
-                noKey = true;
-                return;
-            }
-        }
-
-        public void saveKeyAndRestart(string input)
-        {
-            if(Util.SaveKey(input) == true)
-            {
-                this.key = Util.OpenKey();
-                this.Username = API.Request("user", "info", key, "username");
-                this.installDirectory = API.Request("user", "install", key);
-                
-                this.patchNotes.Url = new System.Uri("http://mods.australianarmedforces.org/html/?scarletKey=" + key, System.UriKind.Absolute);
-            }
+            //  Scarlet Change Internet Explorer Version
+            //      Does:       Changes the registry value for the application to use a more modern version of IE
+            //      Returns:    void
+            ScarletUtil.changeIEVersion(11);
         }
 
         public void postStartup()
         {
+            ScarletKey ScarKey = new ScarletKey("");
+            key = ScarKey.Key;
             if(key == null)
             {
-                this.patchNotes.Url = new System.Uri(ScarletAPI + "/key/?authKey=" + key, System.UriKind.Absolute);
+                this.patchNotes.Url = new System.Uri(ScarletAPI.ScarletURL + "/key/?authKey=" + key, System.UriKind.Absolute);
             }
             else
             {
@@ -180,7 +123,7 @@ namespace AAF_Launcher
         {
             if(this.patchNotes.Url  == new System.Uri(Server + "/html/?scarletKey=" + key, System.UriKind.Absolute))
             {
-                updateStatus("Hi " + Util.FirstCharToUpper(Username) + ".", "33, 153, 232");
+                updateStatus("Hi " + ScarletUtil.FirstCharToUpper(Username) + ".", "33, 153, 232");
                 updateFile("Current Install Directory is: " + installDirectory, "74, 105, 136");
             }
         }
@@ -195,16 +138,11 @@ namespace AAF_Launcher
             // this.strtGameBtn.Enabled = false;
         }
 
-        public void openURL(string URL)
-        {
-            Process.Start(URL);
-        }
-
         // Makes the main window (Form1) dragable
         public void refreshStatus()
         {
-            installDirectory = API.Request("user", "info", key, "installDir");
-            updateStatus("Hi " + Util.FirstCharToUpper(Username) + ".", "33, 153, 232");
+            installDirectory = ScarletAPI.Request("user", "info", key, "installDir");
+            updateStatus("Hi " + ScarletUtil.FirstCharToUpper(Username) + ".", "33, 153, 232");
             updateFile("Current Install Directory is: " + installDirectory, "74, 105, 136");
         }
 
@@ -332,7 +270,7 @@ namespace AAF_Launcher
             // Delete the difference
             foreach (string dir in Enumerable.Except<string>((IEnumerable<string>)allDirs, (IEnumerable<string>)dbDirs, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase))
             {
-                FileOperationAPIWrapper.MoveToRecycleBin(dir);
+                Vendor.FileOperationAPIWrapper.MoveToRecycleBin(dir);
             }
 
             status = 6;
@@ -356,7 +294,7 @@ namespace AAF_Launcher
             // Delete the difference
             foreach (string file in Enumerable.Except<string>((IEnumerable<string>)allFiles, (IEnumerable<string>)dbFiles, (IEqualityComparer<string>)StringComparer.OrdinalIgnoreCase))
             {
-                FileOperationAPIWrapper.MoveToRecycleBin(file);
+                Vendor.FileOperationAPIWrapper.MoveToRecycleBin(file);
             } 
             
 
@@ -391,7 +329,7 @@ namespace AAF_Launcher
                             {
                                 this.Invoke(new Action(() => { downloadLbl_Controller(percent, 1, str2); }));
                                 FileStream stream = System.IO.File.OpenRead(Root + str2);
-                                string b = Util.HashFile(stream);
+                                string b = ScarletUtil.HashFile(stream);
                                 stream.Close();
                                 if (!string.Equals(a, b))
                                 {
@@ -422,8 +360,6 @@ namespace AAF_Launcher
             }
         }
 
-        public void verifyFiles() { }
-
         public void downloadLbl_Controller(double percentage, int type, string currentFile)
         {
             string typer;
@@ -444,57 +380,7 @@ namespace AAF_Launcher
             updateFile(@currentFile);
             updateProgress(percentage);
         }
-
-        /* public void downloadFile(string sSourceURL, string sDestinationPath, double percent, int fileList)
-        {
-            long iFileSize = 0;
-            int iBufferSize = 1024;
-            iBufferSize *= 1000;
-            long iExistLen = 0;
-            long num = 0;
-
-            System.IO.FileStream saveFileStream;
-            if (System.IO.File.Exists(sDestinationPath))
-            {
-                System.IO.FileInfo fINfo =
-                   new System.IO.FileInfo(sDestinationPath);
-                iExistLen = fINfo.Length;
-            }
-            if (iExistLen > 0)
-            {
-                 saveFileStream = new System.IO.FileStream(sDestinationPath,
-                  System.IO.FileMode.Append, System.IO.FileAccess.Write,
-                  System.IO.FileShare.ReadWrite);
-            }
-            else
-            {
-                saveFileStream = new System.IO.FileStream(sDestinationPath,
-                  System.IO.FileMode.Create, System.IO.FileAccess.Write,
-                  System.IO.FileShare.ReadWrite);
-            }
-
-            System.Net.HttpWebRequest hwRq;
-            System.Net.HttpWebResponse hwRes;
-            hwRq = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(sSourceURL);
-            hwRq.AddRange((int)iExistLen);
-            System.IO.Stream smRespStream;
-            hwRes = (System.Net.HttpWebResponse)hwRq.GetResponse();
-            smRespStream = hwRes.GetResponseStream();
-
-            iFileSize = hwRes.ContentLength;
-
-            int iByteSize;
-            byte[] downBuffer = new byte[iBufferSize];
-
-            while ((iByteSize = smRespStream.Read(downBuffer, 0, downBuffer.Length)) > 0)
-            {
-                num += iByteSize;
-                saveFileStream.Write(downBuffer, 0, iByteSize);
-                updateStatus("Downloading Mods (" + ((iExistLen + num) / 1024).ToString("N0") + " KB / " + ((iExistLen + iFileSize) / 1024).ToString("N0") + " KB)");
-            }
-        } */
-
-        
+  
         public void downloadFile(string sUrlToReadFileFrom, string sFilePathToWriteFileTo, double percent, int fileList)
         {
             HttpWebResponse httpWebResponse = (HttpWebResponse)WebRequest.Create(new Uri(sUrlToReadFileFrom)).GetResponse();
@@ -577,7 +463,7 @@ namespace AAF_Launcher
         // Starts the game
         public void strtGameBtn_Click()
         {
-            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/arma3.exe", "-nosplash -skipIntro -connect=58.162.184.102 -password=diggers -port=2302 -mod=" + Util.getModListForGameExec(ModsRoot, ModsDirName));
+            Process.Start(Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Valve\\Steam", "SteamPath", @"C:\Program Files (x86)\Steam") + "/steamapps/common/Arma 3" + "/arma3.exe", "-nosplash -skipIntro -connect=58.162.184.102 -password=diggers -port=2302 -mod=" + ScarletUtil.getModListForGameExec(ModsRoot, ModsDirName));
             this.Close();
         }
     }
