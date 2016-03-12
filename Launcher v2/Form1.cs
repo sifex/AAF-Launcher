@@ -113,7 +113,7 @@ namespace AAF_Launcher
         // Check Current version on Server
         public void checkVersion()
         {
-            var versionURL = Server + "version.txt";
+            var versionURL = "http://mods.australianarmedforces.org/version.txt";
             var versionNo = "";
             try
             {
