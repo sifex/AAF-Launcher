@@ -31,6 +31,21 @@ namespace Scarlet
         // Set Application Variables
         public bool noKey = false;
 
+        public string key {
+            get
+            {
+                return key;
+            }
+            set
+            {
+                this.ClanID = ScarletAPI.Request("user", "info", value, "clanid");
+                this.Username = ScarletAPI.Request("user", "info", value, "username");
+                this.installDirectory = ScarletAPI.Request("user", "info", value, "installDir");
+                this.Server = "http://mods.australianarmedforces.org/clans/" + ClanID + "";
+                this.ServerRepo = Server + "/repo/";
+            }
+        }
+
         // Set as ClanAPI -> URL -> (User API -> Key -> Clanid)
         public string Server;
         public string ServerRepo;
@@ -38,11 +53,9 @@ namespace Scarlet
         public string ModsDirName;
         public string ModsRoot;
         public string Root;
-        public string key;
         public string Username;
         public string installDirectory;
 
-        public bool WorkerSupportsCancellation = true;
         public const int WM_NCLBUTTONDOWN = 161;
         public const int HT_CAPTION = 2;
 
@@ -75,38 +88,35 @@ namespace Scarlet
             //      Does:       Downloads and reads version.txt, compares with imbedded version string
             //      Returns:    void or Application Exit
             ScarletUtil.checkVersion(Version);
-
-            //  Scarlet Key Controller
-            //      Does:       Sets key to the existing key file, deletes if doesn't exist.
-            //      Returns:    void
-            //      $Key:       Set to the Users Key
-            //      $noKey:     Set if Util.OpenKey() returns a FileNotFoundException      
-            // scarletKeyController();
-
-            //  Sets all the variables for the application if noKey hasn't been triggered
-            /* if(noKey == false)
-            {
-                this.ClanID = ScarletAPI.Request("user", "info", key, "clanid");
-                this.Username = ScarletAPI.Request("user", "info", key, "username");
-                this.installDirectory = ScarletAPI.Request("user", "info", key, "installDir");
-                this.Server = "http://mods.australianarmedforces.org/clans/" + ClanID + "";
-                this.ServerRepo = Server + "/repo/";
-            } */
-
-            // Change IE Version
-
-
+            
             //  Scarlet Change Internet Explorer Version
             //      Does:       Changes the registry value for the application to use a more modern version of IE
             //      Returns:    void
             ScarletUtil.changeIEVersion(11);
+
+            //  ScarletKey Object
+            //      Does:       Sets key to the existing key file, deletes if doesn't exist.
+            //      Returns:    void
+            //      $Key:       Set to the Users Key
+            //      $noKey:     Set if Util.OpenKey() returns a FileNotFoundException
+            ScarletKey ScarKey = new ScarletKey();
+            key = ScarKey.Key;
+        }
+
+        public void saveKeyAndRestart(string input)
+        {
+            ScarletKey ScarKey = new ScarletKey();
+            ScarKey.Key = input;
+            if (ScarKey.Key == input)
+            {
+                key = input;
+                this.patchNotes.Url = new System.Uri(Server + "/html/?scarletKey=" + key, System.UriKind.Absolute);
+            }
         }
 
         public void postStartup()
         {
-            ScarletKey ScarKey = new ScarletKey("");
-            key = ScarKey.Key;
-            if(key == null)
+            if(key == "")
             {
                 this.patchNotes.Url = new System.Uri(ScarletAPI.ScarletURL + "/key/?authKey=" + key, System.UriKind.Absolute);
             }

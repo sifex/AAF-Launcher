@@ -12,22 +12,10 @@ namespace Scarlet
     class ScarletKey
     {
         private string key;
-        
-        // Checks and assigns the key to whatevers in the key file & checks validity
-        public ScarletKey(string key)
-        {
-            this.key = key;
-
-            if(key == "")
-            {
-
-            }
-        }
 
         // Opens Existing Keyfile (if file exists)
         public string OpenKey()
         {
-            string key;
             
             // The folder for the roaming current user 
             string folder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -40,16 +28,9 @@ namespace Scarlet
             {
                 if (File.Exists(specificFolder + @"/scarlet_config.cfg"))
                 {
-                    key = File.ReadAllText(specificFolder + @"/scarlet_config.cfg").Replace(System.Environment.NewLine, "");
-                    
-                    if (ScarletAPI.Request("user", "info", key, "id") == "")
-                    {
-                        throw new WebException("Key doesn't exist in Scarlet Database");
-                    }
-                    else
-                    {
-                        return key;
-                    }
+                    this.key = File.ReadAllText(specificFolder + @"/scarlet_config.cfg").Replace(System.Environment.NewLine, "");
+
+                    return this.key;
 
                 }
                 else
@@ -117,11 +98,23 @@ namespace Scarlet
         {
             get
             {
+                try {
+                    key = OpenKey();
+                    try { ScarletAPI.Request("user", "info", key, "id"); }
+                    catch
+                    {
+                        key = "";
+                    }
+                }
+                catch
+                {
+                    key = "";
+                }
                 return key;
             }
             set
             {
-                key = value;
+                SaveKey(value);
             }
         }
     }
