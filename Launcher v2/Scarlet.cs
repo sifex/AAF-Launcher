@@ -23,38 +23,40 @@ namespace Scarlet
     [System.Runtime.InteropServices.ComVisibleAttribute(true)]
     public partial class Scarlet : Form
     {
-        public string Version = "0.8";
+        public string Version = "Macaw";
 
         // Change status codes to exceptions!
         public int status = 1;
 
-        // Set Application Variables
-        public bool noKey = false;
+        // Set as ClanAPI -> URL -> (User API -> Key -> Clanid)
+        public string ClanID;
+        public string Username;
+        public string installDirectory;
+        public string Server;
+        public string ServerRepo;
 
-        public string key {
+        public string ModsDirName;
+        public string ModsRoot;
+        public string Root;
+
+        private string key;
+        public string Key
+        {
             get
             {
                 return key;
             }
             set
             {
-                this.ClanID = ScarletAPI.Request("user", "info", value, "clanid");
-                this.Username = ScarletAPI.Request("user", "info", value, "username");
-                this.installDirectory = ScarletAPI.Request("user", "info", value, "installDir");
-                this.Server = "http://mods.australianarmedforces.org/clans/" + ClanID + "";
-                this.ServerRepo = Server + "/repo/";
+                key = value;
+                ClanID = ScarletAPI.Request("user", "info", value, "clanid");
+                Username = ScarletAPI.Request("user", "info", value, "username");
+                installDirectory = ScarletAPI.Request("user", "info", value, "installDir");
+                Server = "http://mods.australianarmedforces.org/clans/" + ClanID + "";
+                ServerRepo = Server + "/repo/";
+                
             }
         }
-
-        // Set as ClanAPI -> URL -> (User API -> Key -> Clanid)
-        public string Server;
-        public string ServerRepo;
-        public string ClanID;
-        public string ModsDirName;
-        public string ModsRoot;
-        public string Root;
-        public string Username;
-        public string installDirectory;
 
         public const int WM_NCLBUTTONDOWN = 161;
         public const int HT_CAPTION = 2;
@@ -100,7 +102,10 @@ namespace Scarlet
             //      $Key:       Set to the Users Key
             //      $noKey:     Set if Util.OpenKey() returns a FileNotFoundException
             ScarletKey ScarKey = new ScarletKey();
-            key = ScarKey.Key;
+            if(ScarKey.Key != "")
+            {
+                Key = ScarKey.Key;
+            }
         }
 
         public void saveKeyAndRestart(string input)
@@ -109,20 +114,20 @@ namespace Scarlet
             ScarKey.Key = input;
             if (ScarKey.Key == input)
             {
-                key = input;
-                this.patchNotes.Url = new System.Uri(Server + "/html/?scarletKey=" + key, System.UriKind.Absolute);
+                Key = input;
+                this.patchNotes.Url = new System.Uri(Server + "/html/?scarletKey=" + Key, System.UriKind.Absolute);
             }
         }
 
         public void postStartup()
         {
-            if(key == "")
+            if(Key == null)
             {
-                this.patchNotes.Url = new System.Uri(ScarletAPI.ScarletURL + "/key/?authKey=" + key, System.UriKind.Absolute);
+                this.patchNotes.Url = new System.Uri(ScarletAPI.ScarletURL + "/key/?authKey=" + Key, System.UriKind.Absolute);
             }
             else
             {
-                this.patchNotes.Url = new System.Uri(Server + "/html/?scarletKey=" + key, System.UriKind.Absolute);
+                this.patchNotes.Url = new System.Uri(Server + "/html/?scarletKey=" + Key, System.UriKind.Absolute);
             }
 
             this.patchNotes.ObjectForScripting = this;
@@ -131,10 +136,15 @@ namespace Scarlet
 
         private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
-            if(this.patchNotes.Url  == new System.Uri(Server + "/html/?scarletKey=" + key, System.UriKind.Absolute))
+            try {
+                if (patchNotes.Url == new System.Uri(Server + "/html/?scarletKey=" + Key, System.UriKind.Absolute))
+                {
+                    refreshStatus();
+                }
+            }
+            catch
             {
-                updateStatus("Hi " + ScarletUtil.FirstCharToUpper(Username) + ".", "33, 153, 232");
-                updateFile("Current Install Directory is: " + installDirectory, "74, 105, 136");
+
             }
         }
 
@@ -145,15 +155,7 @@ namespace Scarlet
             updateStatus("Fetching Repo");
             updateFile("");
             patchNotes.Document.InvokeScript("disableConfig");
-            // this.strtGameBtn.Enabled = false;
-        }
-
-        // Makes the main window (Form1) dragable
-        public void refreshStatus()
-        {
-            installDirectory = ScarletAPI.Request("user", "info", key, "installDir");
-            updateStatus("Hi " + ScarletUtil.FirstCharToUpper(Username) + ".", "33, 153, 232");
-            updateFile("Current Install Directory is: " + installDirectory, "74, 105, 136");
+            patchNotes.Document.InvokeScript("disableStart");
         }
 
         // Makes the main window (Form1) dragable
@@ -172,6 +174,14 @@ namespace Scarlet
         public void minimizeBtn_Click()
         {
             this.WindowState = FormWindowState.Minimized;
+        }
+
+        // Refresh the Status of Welcome Message
+        public void refreshStatus()
+        {
+            installDirectory = ScarletAPI.Request("user", "info", Key, "installDir");
+            updateStatus("Hi " + ScarletUtil.FirstCharToUpper(Username) + ".", "33, 153, 232");
+            updateFile("Current Install Directory is: " + installDirectory, "74, 105, 136");
         }
 
         public void updateStatus(string status, string colour = null)
@@ -425,6 +435,7 @@ namespace Scarlet
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             patchNotes.Document.InvokeScript("enableConfig");
+            patchNotes.Document.InvokeScript("enableStart");
             switch (status)
             {
                 case 1:

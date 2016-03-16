@@ -100,11 +100,11 @@ namespace Scarlet
             {
                 try {
                     key = OpenKey();
-                    try { ScarletAPI.Request("user", "info", key, "id"); }
+                    /* try { ScarletAPI.Request("user", "info", key, "id"); }
                     catch
                     {
                         key = "";
-                    }
+                    }*/
                 }
                 catch
                 {

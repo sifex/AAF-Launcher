@@ -37,9 +37,9 @@ namespace Scarlet
             }
             if (versionNo != Version)
             {
-                System.Windows.Forms.MessageBox.Show("This version is out of date, please download the updated version.");
+                /* System.Windows.Forms.MessageBox.Show("This version is out of date, please download the updated version.");
                 Process.Start("http://mods.australianarmedforces.org/?update");
-                Environment.Exit(0);
+                Environment.Exit(0); */
             }
         }
 
