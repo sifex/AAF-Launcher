@@ -180,8 +180,8 @@ namespace Scarlet
         public void refreshStatus()
         {
             installDirectory = ScarletAPI.Request("user", "info", Key, "installDir");
-            updateStatus("Hi " + ScarletUtil.FirstCharToUpper(Username) + ".", "33, 153, 232");
-            updateFile("Current Install Directory is: " + installDirectory, "74, 105, 136");
+            updateStatus("Hi " + ScarletUtil.FirstCharToUpper(Username) + ".");
+            updateFile("Current Install Directory is: " + installDirectory);
         }
 
         public void updateStatus(string status, string colour = null)

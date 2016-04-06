@@ -55,7 +55,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Scarlet</RootNamespace>
-    <AssemblyName>AAF_Launcher</AssemblyName>
+    <AssemblyName>Scarlet Updater</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -78,12 +78,12 @@
     <OutputPath>bin\release\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>3</WarningLevel>
+    <WarningLevel>0</WarningLevel>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <UseVSHostingProcess>true</UseVSHostingProcess>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <DocumentationFile>bin\release\AAF_Launcher.XML</DocumentationFile>
+    <DocumentationFile>bin\release\Scarlet Updater.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>Resources\app.manifest</ApplicationManifest>
