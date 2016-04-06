@@ -60,7 +60,7 @@ namespace Scarlet
             {
                 Directory.CreateDirectory(specificFolder);
             }
-
+            
 
             if (string.Equals(ScarletAPI.Request("user", "info", key, "id"), ""))
             {

@@ -23,7 +23,7 @@ namespace Scarlet
     [System.Runtime.InteropServices.ComVisibleAttribute(true)]
     public partial class Scarlet : Form
     {
-        public string Version = "Macaw";
+        public string Version = "0.8";
 
         // Change status codes to exceptions!
         public int status = 1;
