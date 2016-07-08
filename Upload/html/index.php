@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="cache-control" content="no-cache">
 	<meta name="viewport" content="user-scalable=no" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta charset="UTF-8">
 	<title>Australian Armed Forces</title>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" charset="utf-8"></script>
@@ -50,7 +50,7 @@
 		#minimise:hover {
 			background: url('http://i.imgur.com/LQOLaD9.png');
 		}
-		
+
 		#loadingBar {
 			width: 710px;
 			height: 31px;
@@ -65,10 +65,10 @@
 			background: #1E90FF;
 		}
 		*:not(.small-11) {
-			-webkit-user-select: none; /* Chrome/Safari */        
+			-webkit-user-select: none; /* Chrome/Safari */
 			-moz-user-select: none; /* Firefox */
 			-ms-user-select: none; /* IE10+ */
-			
+
 			/* Rules below not implemented in browsers yet */
 			-o-user-select: none;
 			user-select: none;
@@ -163,13 +163,11 @@
 		<div class="logo"></div>
 	</a>
 	<span>
-		Copyright &copy; 2016 Australian Armed Forces 
-		<br /> 
+		Copyright &copy; 2016 Australian Armed Forces
+		<br />
 		AAF Launcher – Version <?php echo file_get_contents('../version.txt'); ?>
 		<br />
 		<a href="ts3server://ts.australianarmedforces.org?port=9987">Teamspeak</a>
-		   |   
-		<a style="color: #cd4c2e" onClick="window.external.openURL('http://development.australianarmedforces.org/secure/CreateIssue!default.jspa')" href="#">Report an Issue</a>
 		<br />
 		<a id="configButton" data-open="exampleModal">Config</a>
 	</span>
@@ -190,9 +188,9 @@
 	            <label>Install Directory</label>
 	              <input type="text" class="small-11 columns" placeholder="" id="filePath">
 				  <a id="installDirSelect" class="small-1 columns text-center button" href="#" onClick="window.external.ChooseFolder()">...</a>
-	            
+
 	          </div>
-	          
+
 	        </div>
 	        <div class="row">
 		        <div class="small-12 columns">
@@ -203,12 +201,12 @@
 	</div>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js" charset="utf-8"></script>
-	<script src="/html/js/owl.carousel.min.js" charset="utf-8"></script>
+	<script src="js/owl.carousel.min.js" charset="utf-8"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.1.2/foundation.js" charset="utf-8"></script>
 	<script>
 		$(document).ready(function() {
 			$("#owl-demo").owlCarousel({
-	 
+
 				navigation : false, // Show next and prev buttons
 				singleItem: true,
 				transitionStyle : "fade",
@@ -217,111 +215,21 @@
 				dragBeforeAnimFinish : false,
 				mouseDrag : false,
 				touchDrag : false
-	 
+
 	      // "singleItem:true" is a shortcut for:
-	      // items : 1, 
+	      // items : 1,
 	      // itemsDesktop : false,
 	      // itemsDesktopSmall : false,
 	      // itemsTablet: false,
 	      // itemsMobile : false
-	 
+
 	  });
 		});
-		
+
 		$(document).foundation();
-			
-		var done = false;
-		
-		function get(url) {
-			$.get(url, function( data ) {
-				return data;
-			});
-		}
-		
-		$("#draggable").mousedown(function() {
-			window.external.drag();
-		});
-		
-		$(function() {
-			$.get("http://scarlet.australianarmedforces.org/api/user/install/<?php echo $_GET['scarletKey']; ?>/", function(data){
-				$("#filePath").val(data);
-			});
-		});
-		
-		$("#installForm").submit(function(e) {
-			e.preventDefault();
-			$.post("http://scarlet.australianarmedforces.org/api/user/install/<?php echo $_GET['scarletKey']; ?>/", {installDir: $("#filePath").val()}).done(function() {
-					$('#exampleModal').foundation('close');
-					window.external.refreshStatus();
-				});
-		});
-		
-		$("#close").click(function() {
-			window.external.closeBtn_Click();
-		});
-		
-		$("#minimise").click(function() {
-			window.external.minimizeBtn_Click();
-		});
-		
-		function updateStatus(string, color) {
-			$(".status").html(string);
-			if(typeof color != 'undefined') {	
-				$(".status").css("color", "rgb(" + color + ")");
-			}
-		}
-		
-		function updateFile(string, color) {
-			$(".file").html(string);
-			if(typeof color != 'undefined') {			
-				$(".file").css("color", "rgb(" + color + ")");
-			}
-		}
-		
-		function updateProgress(progress, color) {
-			$("#progress").width(function() {
-				return progress * $("#loadingBar").width();
-			});
-			if(typeof color != 'undefined') {			
-				$("#progress").css("background-color", "rgb(" + color + ")");
-			}
-		}
-		
-		function disableConfig() {
-			$("#configButton").removeAttr('data-open');
-			$("#configButton").attr('class', 'disabled');
-		} /*
-		
-		function enableConfig() {
-			$("#configButton").attr('data-open', "exampleModal");
-			$("#configButton").removeAttr('class');
-		} */
-		
-		function fillPath(path) {
-			$("#filePath").val(path);
-		}
-		
-		$("#startGame").click(function() {
-			if(done == false) {
-				$(this).attr('class', 'button disabled');
-				window.external.update_Click();
-			}
-			else {
-				window.external.strtGameBtn_Click();	
-			}
-		});	
-		
-		function completed() {
-			$("#startGame").css('background', 'rgb(100, 206,63)');
-			$("#startGame").attr('class', 'button');
-			$("#startGame").html("Start Game");
-			
-			done = true;
-		}
 
-
-		
 	</script>
-	
+	<script src="js/scarlet_functions.js" charset="utf-8"></script>
+
 </body>
 </html>
