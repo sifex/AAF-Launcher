@@ -23,7 +23,7 @@ namespace Scarlet
     [System.Runtime.InteropServices.ComVisibleAttribute(true)]
     public partial class Scarlet : Form
     {
-        public string Version = "0.8";
+        public string Version = "1.0";
 
         // Change status codes to exceptions!
         public int status = 1;
@@ -89,7 +89,7 @@ namespace Scarlet
             //  Check's Application Version
             //      Does:       Downloads and reads version.txt, compares with imbedded version string
             //      Returns:    void or Application Exit
-            ScarletUtil.checkVersion(Version);
+            // ScarletUtil.checkVersion(Version);
             
             //  Scarlet Change Internet Explorer Version
             //      Does:       Changes the registry value for the application to use a more modern version of IE
@@ -250,6 +250,8 @@ namespace Scarlet
 
             // Loads Server Repos XML
             XDocument xmlRepo = XDocument.Load(this.ServerRepo + "/main/repo.xml");
+            xmlRepo.Save(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/scarlet/repo.xml", SaveOptions.None);
+            xmlRepo = XDocument.Load(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/scarlet/repo.xml");
             
             // Fetches ModRoot Directory from Server, or Defaults to /Server_Mods/
             // Don't use /Mods/ as a folder as your clan will bug you to ask where their custom 1337 mods have gone! 
@@ -411,7 +413,7 @@ namespace Scarlet
             {
                 using (Stream stream1 = webClient.OpenRead(new Uri(sUrlToReadFileFrom)))
                 {
-                    using (Stream stream2 = new FileStream(sFilePathToWriteFileTo, FileMode.Create, FileAccess.Write, FileShare.None))
+                    using (Stream stream2 = new FileStream(sFilePathToWriteFileTo, FileMode.Create, FileAccess.Write, FileShare.Read))
                     {
                         byte[] buffer = new byte[contentLength];
                         int count;
