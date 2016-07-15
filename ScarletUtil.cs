@@ -26,7 +26,7 @@ namespace Scarlet
         // Check Current version on Server
         public static void checkVersion(string Version)
         {
-            var versionURL = "http://127.0.0.1/api/";
+            var versionURL = "http://scarlet.australianarmedforces.org/api/";
             string versionNo = "";
             try
             {

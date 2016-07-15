@@ -24,9 +24,9 @@ namespace Scarlet
 
         public string ClanID;
         public string Username;
-        public string installDirectory;
+        public string installDirectory = @"C:\Users\Alex\Desktop\";
         public string Server;
-        public string ServerRepo;
+        public string ServerRepo = "http://mods.australianarmedforces.org/clans/2/repo/";
 
         public string ModsDirName;
         public string ModsRoot;
@@ -96,6 +96,7 @@ namespace Scarlet
                     {
                         if (words[2] == "startDownload")
                         {
+
                             backgroundWorker1.RunWorkerAsync();
                         }
                         if (words[2] == "Broadcast")
@@ -170,6 +171,7 @@ namespace Scarlet
                 o[1] = colour;
             }
             o[0] = status;
+            ws.Send("Browser|" + IP + "|" + o[0]);
             // patchNotes.Document.InvokeScript("updateStatus", o);
         }
 
