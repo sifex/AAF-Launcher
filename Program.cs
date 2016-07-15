@@ -1,8 +1,21 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Diagnostics;
 using System.IO;
-using System.Windows.Forms;
-using Microsoft.Win32;
+using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
+using System.Security;
+using System.Security.Cryptography;
+using System.Text;
+using System.Windows.Forms;
+using System.Xml.Linq;
+using Microsoft.VisualBasic;
+using System.Windows;
+using System.Security.Permissions;
 
 namespace Scarlet
 {

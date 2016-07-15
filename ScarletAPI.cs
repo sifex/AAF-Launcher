@@ -7,7 +7,7 @@ namespace Scarlet
 {
     public static class ScarletAPI
     {
-        public static string ScarletURL = "http://scarlet.australianarmedforces.org/";
+        public static string ScarletURL = "http://127.0.0.1/";
 
         public static string APIURL(string type = "", string method = "", string identifyer = "", string returnValue = "")
         {

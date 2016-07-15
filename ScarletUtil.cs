@@ -6,6 +6,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System;
+using MinimalJson;
 
 namespace Scarlet
 {
@@ -25,11 +26,12 @@ namespace Scarlet
         // Check Current version on Server
         public static void checkVersion(string Version)
         {
-            var versionURL = "http://mods.australianarmedforces.org/version.txt";
-            var versionNo = "";
+            var versionURL = "http://127.0.0.1/api/";
+            string versionNo = "";
             try
             {
-                versionNo = (new WebClient()).DownloadString(versionURL);
+                JsonObject verGet = JsonObject.readFrom((new WebClient()).DownloadString(versionURL));
+                versionNo = verGet.get("Version").asString();
             }
             catch (System.Net.WebException)
             {
@@ -57,37 +59,6 @@ namespace Scarlet
                 stream.Seek(0L, SeekOrigin.Begin);
             }
             return stringBuilder.ToString();
-        }
-
-        // Changes the IE Version within the Registry
-        public static void changeIEVersion(int version)
-        {
-            object regCheck = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Internet Explorer\\Main\\FeatureControl\\FEATURE_BROWSER_EMULATION", Process.GetCurrentProcess().ProcessName + ".exe", null);
-            if (regCheck == null)
-            {
-                int RegVal;
-                int BrowserVer = version;
-
-                // Set the appropriate IE version
-                if (BrowserVer >= 11)
-                    RegVal = 11001;
-                else if (BrowserVer == 10)
-                    RegVal = 10001;
-                else if (BrowserVer == 9)
-                    RegVal = 9999;
-                else if (BrowserVer == 8)
-                    RegVal = 8888;
-                else
-                    RegVal = 7000;
-
-                // set the actual key
-
-                Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION");
-                RegistryKey Key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
-
-                Key.SetValue(Process.GetCurrentProcess().ProcessName + ".exe", RegVal, RegistryValueKind.DWord);
-                Key.Close();
-            }
         }
 
         // First Character to Uppercase
