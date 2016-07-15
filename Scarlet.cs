@@ -26,7 +26,7 @@ namespace Scarlet
         public string Username;
         public string installDirectory = @"C:\Users\Alex\Desktop\";
         public string Server;
-        public string ServerRepo = "http://mods.australianarmedforces.org/clans/2/repo/";
+        public string ServerRepo = "http://mods.australianarmedforces.org/clans/2/repo";
 
         public string ModsDirName;
         public string ModsRoot;
@@ -85,6 +85,11 @@ namespace Scarlet
 
             ws.Connect();
 
+            ws.OnOpen += (sender, e) =>
+            {
+                ws.Send("Browser|" + IP + "|Connected");
+            };
+
             ws.OnMessage += (sender, e) =>
             {
                 // Scarlet WS API
@@ -96,8 +101,11 @@ namespace Scarlet
                     {
                         if (words[2] == "startDownload")
                         {
-
-                            backgroundWorker1.RunWorkerAsync();
+                            if(backgroundWorker1.IsBusy == false)
+                            {
+                                backgroundWorker1.RunWorkerAsync();
+                            }
+                            
                         }
                         if (words[2] == "Broadcast")
                         {
@@ -171,7 +179,10 @@ namespace Scarlet
                 o[1] = colour;
             }
             o[0] = status;
-            ws.Send("Browser|" + IP + "|" + o[0]);
+            if(status != "")
+            {
+                ws.Send("Browser|" + IP + "|UpdateStatus|" + o[0]);
+            }
             // patchNotes.Document.InvokeScript("updateStatus", o);
         }
 
@@ -183,6 +194,10 @@ namespace Scarlet
                 o[1] = colour;
             }
             o[0] = file;
+            if (file != "")
+            {
+                ws.Send("Browser|" + IP + "|UpdateStatus|" + o[0]);
+            }
             // patchNotes.Document.InvokeScript("updatefile", o);
 
         }
@@ -212,7 +227,7 @@ namespace Scarlet
             status = 8;
 
             // Loads Server Repos XML
-            XDocument xmlRepo = XDocument.Load(this.ServerRepo + "/main/repo.xml");
+            XDocument xmlRepo = XDocument.Load(this.ServerRepo + "/repo.xml");
             xmlRepo.Save(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/scarlet/repo.xml", SaveOptions.None);
             xmlRepo = XDocument.Load(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/scarlet/repo.xml");
 
@@ -303,7 +318,7 @@ namespace Scarlet
                 {
                     string str2 = xelement.Element("name").Value;
                     string a = xelement.Element("hash").Value;
-                    string sUrlToReadFileFrom = this.ServerRepo + "/main/" + str2;
+                    string sUrlToReadFileFrom = this.ServerRepo + "/" + str2;
                     string str3 = Root + str2;
                     double percent = (double)filesDone / fileList;
                     if (Root != null)
@@ -320,13 +335,13 @@ namespace Scarlet
                                 {
                                     File.Delete(str3);
                                     this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
-                                    downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
+                                    // downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                                 }
                             }
                             else
                             {
                                 this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
-                                this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
+                                // this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                             }
                         }
                     }
