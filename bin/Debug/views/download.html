@@ -11,75 +11,83 @@
     <!-- Place favicon.ico in the root directory -->
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation.css">
-    <script src="js/vendor/modernizr-2.8.3.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://scarlet.australianarmedforces.org/css/app.css">
 </head>
 <body>
     <!--[if lt IE 8]>
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
     <!-- Add your site or application content here -->
-    <p>Hello world! This is HTML5 Boilerplate.</p>
+    <div id="coming-soon" class="small-10 small-centered columns text-center">
+<div class="logo"></div>
+<p>
+<div class="data">
+<input type="button" onclick="doSend('Hello World')" name="" value="Message">
+    <p id="output"></p>
+</div>
+</p>
+</div>
+    
 
     <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation.js"></script>
 
       <script language="javascript" type="text/javascript">
 
-  var wsUri = "ws://127.0.0.1:8080";
-  var output;
+        var wsUri = "ws://scarlet.australianarmedforces.org:8080";
+        var output;
 
-  function init()
-  {
-    output = document.getElementById("output");
-    testWebSocket();
-  }
+        function init()
+        {
+        output = document.getElementById("output");
+        testWebSocket();
+        }
 
-  function testWebSocket()
-  {
-    websocket = new WebSocket(wsUri);
-    websocket.onopen = function(evt) { onOpen(evt) };
-    websocket.onclose = function(evt) { onClose(evt) };
-    websocket.onmessage = function(evt) { onMessage(evt) };
-    websocket.onerror = function(evt) { onError(evt) };
-  }
+        function testWebSocket()
+        {
+        websocket = new WebSocket(wsUri);
+        websocket.onopen = function(evt) { onOpen(evt) };
+        websocket.onclose = function(evt) { onClose(evt) };
+        websocket.onmessage = function(evt) { onMessage(evt) };
+        websocket.onerror = function(evt) { onError(evt) };
+        }
 
-  function onOpen(evt)
-  {
-    writeToScreen("CONNECTED");
-    doSend("WebSocket rocks");
-  }
+        function onOpen(evt)
+        {
+        writeToScreen("CONNECTED");
+        doSend("WebSocket rocks");
+        }
 
-  function onClose(evt)
-  {
-    writeToScreen("DISCONNECTED");
-  }
+        function onClose(evt)
+        {
+        writeToScreen("DISCONNECTED");
+        }
 
-  function onMessage(evt)
-  {
-    writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
-    websocket.close();
-  }
+        function onMessage(evt)
+        {
+        writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
+        }
 
-  function onError(evt)
-  {
-    writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
-  }
+        function onError(evt)
+        {
+        writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+        }
 
-  function doSend(message)
-  {
-    writeToScreen("SENT: " + message);
-    websocket.send(message);
-  }
+        function doSend(message)
+        {
+        writeToScreen("SENT: " + message);
+        websocket.send(message);
+        }
 
-  function writeToScreen(message)
-  {
-    var pre = document.createElement("p");
-    pre.style.wordWrap = "break-word";
-    pre.innerHTML = message;
-    output.appendChild(pre);
-  }
+        function writeToScreen(message)
+        {
+        var pre = document.createElement("p");
+        pre.style.wordWrap = "break-word";
+        pre.innerHTML = message;
+        output.innerHTML = message;
+        }
 
-  window.addEventListener("load", init, false);
+        window.addEventListener("load", init, false);
 
   </script>
 </body>
