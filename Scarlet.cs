@@ -99,12 +99,21 @@ namespace Scarlet
                 {
                     if (words[1] == IP || words[1] == "*")
                     {
+                        if (words[2] == "browserConnect")
+                        {
+                            ws.Send("Browser|" + IP + "|browserConfirmation");
+
+                        }
                         if (words[2] == "startDownload")
                         {
-                            if(backgroundWorker1.IsBusy == false)
+                            if (backgroundWorker1.IsBusy == false)
                             {
                                 backgroundWorker1.RunWorkerAsync();
                             }
+
+                        }
+                        if (words[2] == "locationChange")
+                        {
                             
                         }
                         if (words[2] == "Broadcast")
@@ -210,6 +219,10 @@ namespace Scarlet
                 o[1] = colour;
             }
             o[0] = progress;
+            if ((Math.Round((double)(progress * 100), 2).ToString()) != "")
+            {
+                ws.Send("Browser|" + IP + "|UpdateProgress|" + ((Math.Round((double)(progress * 100), 2).ToString())));
+            }
             // patchNotes.Document.InvokeScript("updateProgress", o);
         }
 
