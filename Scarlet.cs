@@ -53,8 +53,24 @@ namespace Scarlet
             // Setup Download Linking + Routes
             Scarlet_WS_Initialise();
 
+            // Initalise Form
+            InitializeComponent();
+
             // Initalise Tray Icon
             TrayIcon();
+
+        }
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            // 
+            // Scarlet
+            // 
+            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Name = "Scarlet";
+            this.Load += new System.EventHandler(this.reconnectWS);
+            this.ResumeLayout(false);
 
         }
 
@@ -83,7 +99,7 @@ namespace Scarlet
         public void Scarlet_WS_Initialise()
         {
             ws = new WebSocket("ws://scarlet.australianarmedforces.org:8080");
-
+            
             ws.Connect();
 
             ws.OnOpen += (sender, e) =>
@@ -128,12 +144,18 @@ namespace Scarlet
 
         }
 
+        private void reconnectWS(object sender, EventArgs e)
+        {
+            ws.Connect();
+        }
+
         /* Tray */
         public void TrayIcon()
         {
             // Create a simple tray menu with only one item.
             trayMenu = new ContextMenu();
             trayMenu.MenuItems.Add("Exit", ExitApplication);
+            trayMenu.MenuItems.Add("Attempt Reconnect", reconnectWS);
 
             // Create a tray icon. In this example we use a
             // standard system icon for simplicity, but you
@@ -221,15 +243,28 @@ namespace Scarlet
 
         public void ChooseFolder()
         {
-            this.Invoke((Action)delegate {
-                var folderBrowser = new FolderBrowserDialog();
-                folderBrowser.Description = "Select Scarlet Installation Folder";
-                folderBrowser.RootFolder = Environment.SpecialFolder.MyComputer;
-                folderBrowser.ShowNewFolderButton = true;
+            this.Invoke((Action) delegate {
 
-                if (folderBrowser.ShowDialog(this) == DialogResult.OK)
+                using (var owner = new Form()
                 {
-                    ws.Send("Browser|" + IP + "|UpdateInstallLocation|" + folderBrowser.SelectedPath);
+                    Width = 0,
+                    Height = 0,
+                    StartPosition = FormStartPosition.CenterScreen,
+                    Text = "Browse for Folder"
+                })
+                {
+
+                    var folderBrowser = new FolderBrowserDialog();
+                    folderBrowser.Description = "Select Scarlet Installation Folder";
+                    folderBrowser.RootFolder = Environment.SpecialFolder.MyComputer;
+                    folderBrowser.ShowNewFolderButton = true;
+
+                    owner.BringToFront();
+                    if (folderBrowser.ShowDialog(this) == DialogResult.OK)
+                    {
+                        ws.Send("Browser|" + IP + "|UpdateInstallLocation|" + folderBrowser.SelectedPath);
+                        installDirectory = folderBrowser.SelectedPath;
+                    }
                 }
             });
         }
@@ -318,7 +353,6 @@ namespace Scarlet
                 Vendor.FileOperationAPIWrapper.MoveToRecycleBin(file);
             }
 
-
             status = 7;
 
             int filesDone = 0;
@@ -356,13 +390,13 @@ namespace Scarlet
                                 {
                                     File.Delete(str3);
                                     this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
-                                    // downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
+                                    downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                                 }
                             }
                             else
                             {
                                 this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
-                                // downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
+                                downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                             }
                         }
                     }

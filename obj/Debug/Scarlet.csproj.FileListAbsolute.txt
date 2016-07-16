@@ -30,3 +30,4 @@ C:\Users\Alex\Source\Repos\AAF-Launcher\bin\Debug\websocket-sharp.xml
 C:\Users\Alex\Source\Repos\AAF-Launcher\obj\Debug\Scarlet.csprojResolveAssemblyReference.cache
 C:\Users\Alex\Source\Repos\AAF-Launcher\obj\Debug\Scarlet.Properties.Resources.resources
 C:\Users\Alex\Source\Repos\AAF-Launcher\obj\Debug\Scarlet.csproj.GenerateResource.Cache
+C:\Users\Alex\Desktop\Scarlet\obj\Debug\Scarlet.Scarlet.resources
