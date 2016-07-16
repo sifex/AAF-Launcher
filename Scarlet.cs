@@ -42,6 +42,7 @@ namespace Scarlet
         private ContextMenu trayMenu;
 
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        delegate void UpdateDelegate(string text);
 
         public Scarlet()
         {
@@ -102,7 +103,6 @@ namespace Scarlet
                         if (words[2] == "browserConnect")
                         {
                             ws.Send("Browser|" + IP + "|browserConfirmation");
-
                         }
                         if (words[2] == "startDownload")
                         {
@@ -110,11 +110,10 @@ namespace Scarlet
                             {
                                 backgroundWorker1.RunWorkerAsync();
                             }
-
                         }
                         if (words[2] == "locationChange")
                         {
-                            
+                            ChooseFolder();
                         }
                         if (words[2] == "Broadcast")
                         {
@@ -146,7 +145,7 @@ namespace Scarlet
             // Add menu to tray icon and show it.
             trayIcon.ContextMenu = trayMenu;
             trayIcon.Visible = true;
-            trayIcon.Click += new EventHandler(this.trayIcon_Click);
+            trayIcon.DoubleClick += new EventHandler(this.trayIcon_Click);
         }
 
         protected override void OnLoad(EventArgs e)
@@ -188,10 +187,8 @@ namespace Scarlet
                 o[1] = colour;
             }
             o[0] = status;
-            if(status != "")
-            {
-                ws.Send("Browser|" + IP + "|UpdateStatus|" + o[0]);
-            }
+            ws.Send("Browser|" + IP + "|UpdateStatus|" + o[0] + "|" + o[1]);
+
             // patchNotes.Document.InvokeScript("updateStatus", o);
         }
 
@@ -203,10 +200,8 @@ namespace Scarlet
                 o[1] = colour;
             }
             o[0] = file;
-            if (file != "")
-            {
-                ws.Send("Browser|" + IP + "|UpdateStatus|" + o[0]);
-            }
+            ws.Send("Browser|" + IP + "|UpdateFile|" + o[0] + "|" + o[1]);
+
             // patchNotes.Document.InvokeScript("updatefile", o);
 
         }
@@ -219,11 +214,24 @@ namespace Scarlet
                 o[1] = colour;
             }
             o[0] = progress;
-            if ((Math.Round((double)(progress * 100), 2).ToString()) != "")
-            {
-                ws.Send("Browser|" + IP + "|UpdateProgress|" + ((Math.Round((double)(progress * 100), 2).ToString())));
-            }
+            ws.Send("Browser|" + IP + "|UpdateProgress|" + ((Math.Round((double)(progress * 100), 2).ToString())));
+
             // patchNotes.Document.InvokeScript("updateProgress", o);
+        }
+
+        public void ChooseFolder()
+        {
+            this.Invoke((Action)delegate {
+                var folderBrowser = new FolderBrowserDialog();
+                folderBrowser.Description = "Select Scarlet Installation Folder";
+                folderBrowser.RootFolder = Environment.SpecialFolder.MyComputer;
+                folderBrowser.ShowNewFolderButton = true;
+
+                if (folderBrowser.ShowDialog(this) == DialogResult.OK)
+                {
+                    ws.Send("Browser|" + IP + "|UpdateInstallLocation|" + folderBrowser.SelectedPath);
+                }
+            });
         }
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
@@ -354,7 +362,7 @@ namespace Scarlet
                             else
                             {
                                 this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
-                                // this.downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
+                                // downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
                             }
                         }
                     }
@@ -379,17 +387,13 @@ namespace Scarlet
             if (type == 1)
             {
                 typer = "Verifying Mods";
-                updateStatus(typer);
-                updateFile("");
             }
             else
             {
                 typer = "Downloading Mods";
-                updateStatus(typer);
-                updateFile("");
             }
 
-            updateStatus(typer + " - " + (Math.Round((double)(percentage * 100), 2).ToString()) + "%");
+            updateStatus(typer + " " /* + (Math.Round((double)(percentage * 100), 2).ToString()) + "%" */);
             updateFile(@currentFile);
             updateProgress(percentage);
         }
@@ -430,8 +434,8 @@ namespace Scarlet
                     break;
                 case 10:
                     updateStatus("Mods are up to date. Ready to Launch.", "100, 206, 63");
+                    ws.Send("Browser|" + IP + "|Completed");
                     updateFile("");
-                    // patchNotes.Document.InvokeScript("completed");
 
                     updateProgress(1.0, "100, 206, 63");
                     break;
