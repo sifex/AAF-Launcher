@@ -44,9 +44,6 @@ namespace Scarlet
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         delegate void UpdateDelegate(string text);
 
-        EventHandler broadcast;
-        EventHandler folderOpen;
-
         public Scarlet()
         {
 
@@ -127,7 +124,14 @@ namespace Scarlet
                     {
                         if (words[2] == "browserConnect")
                         {
-                            ws.Send("Browser|" + IP + "|browserConfirmation");
+                            if (backgroundWorker1.IsBusy == false)
+                            {
+                                ws.Send("Browser|" + IP + "|browserConfirmation|free");
+                            }
+                            else
+                            {
+                                ws.Send("Browser|" + IP + "|browserConfirmation|busy");
+                            }
                         }
                         if (words[2] == "startDownload")
                         {
@@ -152,6 +156,10 @@ namespace Scarlet
                         if (words[2] == "FetchAll")
                         {
 
+                        }
+                        if (words[2] == "Quit")
+                        {
+                            Application.Exit();
                         }
                     }
                 }
@@ -178,6 +186,7 @@ namespace Scarlet
             // Create a simple tray menu with only one item.
             trayMenu = new ContextMenu();
             trayMenu.MenuItems.Add("Attempt Reconnect", reconnect);
+            trayMenu.MenuItems.Add(new ToolStripSeparator().ToString());
             trayMenu.MenuItems.Add("Exit", ExitApplication);
 
             // Create a tray icon. In this example we use a
@@ -443,11 +452,11 @@ namespace Scarlet
             string typer;
             if (type == 1)
             {
-                typer = "Verifying Mods";
+                typer = "Verifying";
             }
             else
             {
-                typer = "Downloading Mods";
+                typer = "Downloading";
             }
 
             updateStatus(typer + " " /* + (Math.Round((double)(percentage * 100), 2).ToString()) + "%" */);
