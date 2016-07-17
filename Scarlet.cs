@@ -24,7 +24,7 @@ namespace Scarlet
 
         public string ClanID;
         public string Username;
-        public string installDirectory = @"C:\Users\Alex\Desktop\";
+        public string installDirectory;
         public string Server;
         public string ServerRepo = "http://mods.australianarmedforces.org/clans/2/repo";
 
@@ -44,6 +44,9 @@ namespace Scarlet
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         delegate void UpdateDelegate(string text);
 
+        EventHandler broadcast;
+        EventHandler folderOpen;
+
         public Scarlet()
         {
 
@@ -58,7 +61,6 @@ namespace Scarlet
 
             // Initalise Tray Icon
             TrayIcon();
-
         }
 
         private void InitializeComponent()
@@ -69,8 +71,14 @@ namespace Scarlet
             // 
             this.ClientSize = new System.Drawing.Size(284, 261);
             this.Name = "Scarlet";
-            this.Load += new System.EventHandler(this.reconnectWS);
-            this.ResumeLayout(false);
+            this.Load += new System.EventHandler(this.formLoad);
+            this.ResumeLayout(true);
+
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.backgroundWorker1.WorkerReportsProgress = true;
+            this.backgroundWorker1.WorkerSupportsCancellation = true;
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
 
         }
 
@@ -87,13 +95,14 @@ namespace Scarlet
             ScarletUtil.checkVersion(Version);
 
             IP = new WebClient().DownloadString("https://api.ipify.org");
-
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.backgroundWorker1.WorkerReportsProgress = true;
-            this.backgroundWorker1.WorkerSupportsCancellation = true;
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
-            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
         }
+
+        public void formLoad(object sender, EventArgs e)
+        {
+            ws.Connect();
+            ScarletUtil.openURL("http://scarlet.australianarmedforces.org/download");
+        }
+
 
         /* WS */
         public void Scarlet_WS_Initialise()
@@ -122,6 +131,7 @@ namespace Scarlet
                         }
                         if (words[2] == "startDownload")
                         {
+                            installDirectory = words[3];
                             if (backgroundWorker1.IsBusy == false)
                             {
                                 backgroundWorker1.RunWorkerAsync();
@@ -131,9 +141,17 @@ namespace Scarlet
                         {
                             ChooseFolder();
                         }
+                        if (words[2] == "updateInstallLocation")
+                        {
+                            installDirectory = words[3];
+                        }
                         if (words[2] == "Broadcast")
                         {
                             MessageBox.Show(words[3], "Scarlet Updater", MessageBoxButtons.OK);
+                        }
+                        if (words[2] == "FetchAll")
+                        {
+
                         }
                     }
                 }
@@ -144,9 +162,14 @@ namespace Scarlet
 
         }
 
-        private void reconnectWS(object sender, EventArgs e)
+        public void reconnect(object sender, EventArgs e)
         {
             ws.Connect();
+        }
+
+        public void broadcastOpen()
+        {
+
         }
 
         /* Tray */
@@ -154,8 +177,8 @@ namespace Scarlet
         {
             // Create a simple tray menu with only one item.
             trayMenu = new ContextMenu();
+            trayMenu.MenuItems.Add("Attempt Reconnect", reconnect);
             trayMenu.MenuItems.Add("Exit", ExitApplication);
-            trayMenu.MenuItems.Add("Attempt Reconnect", reconnectWS);
 
             // Create a tray icon. In this example we use a
             // standard system icon for simplicity, but you
