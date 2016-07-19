@@ -20,7 +20,7 @@ using System.Security.Permissions;
 
 namespace Scarlet
 {
-    static class Program
+    public static class Program
     {
         private static Mutex m_Mutex;
 
@@ -38,8 +38,7 @@ namespace Scarlet
             }
             else
             {
-                MessageBox.Show("The application is already running.", Application.ProductName,
-                  MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("The application is already running.", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
     }

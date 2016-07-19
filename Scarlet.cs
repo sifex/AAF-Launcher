@@ -15,9 +15,12 @@ using System.Diagnostics;
 
 namespace Scarlet
 {
-    public partial class Scarlet : Form
+    public class Scarlet : Form
     {
-        public string Version = "1.0";
+        public string Version = "1.0.1";
+        public string scarletURL = "scarlet.australianarmedforces.org";
+        public string scarletPort = "8080";
+        public bool dev = true;
 
         // Change status codes to exceptions!
         public int status = 1;
@@ -32,6 +35,10 @@ namespace Scarlet
         public string ModsRoot;
         public string Root;
 
+        // Statusus for Pushing on Mid-Download
+        public double downloadPercentage;
+        public string downloadStatus;
+        public string downloadCurrentFile;
 
         // WS
         WebSocket ws;
@@ -39,13 +46,20 @@ namespace Scarlet
 
         // Tray
         private NotifyIcon trayIcon;
-        private ContextMenu trayMenu;
+        private ContextMenu trayMenu = new ContextMenu();
 
+        // ASYNC Background Worker
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         delegate void UpdateDelegate(string text);
 
         public Scarlet()
         {
+            if(dev == true)
+            {
+                scarletPort = "8080";
+                scarletURL = "staging.scarlet.australianarmedforces.org";
+                Version = "1.0.1";
+            }
 
             // Prep for Startup
             preStartup();
@@ -58,14 +72,12 @@ namespace Scarlet
 
             // Initalise Tray Icon
             TrayIcon();
+
         }
 
         private void InitializeComponent()
         {
             this.SuspendLayout();
-            // 
-            // Scarlet
-            // 
             this.ClientSize = new System.Drawing.Size(284, 261);
             this.Name = "Scarlet";
             this.Load += new System.EventHandler(this.formLoad);
@@ -76,35 +88,26 @@ namespace Scarlet
             this.backgroundWorker1.WorkerSupportsCancellation = true;
             this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
             this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
-
         }
 
         public void preStartup()
         {
-            //  Test Connection to API Scarlet Servers 
-            //      Does:       Sends a blank API Request to the Scarlet Servers
-            //      Returns:    void or Application Exit
-            ScarletUtil.testConnection();
-
-            //  Check's Application Version
-            //      Does:       Downloads and reads version.txt, compares with imbedded version string
-            //      Returns:    void or Application Exit
-            ScarletUtil.checkVersion(Version);
+            ScarletUtil.testConnection(this);
+            ScarletUtil.checkVersion(this);
 
             IP = new WebClient().DownloadString("https://api.ipify.org");
         }
 
         public void formLoad(object sender, EventArgs e)
         {
-            ws.Connect();
-            ScarletUtil.openURL("http://scarlet.australianarmedforces.org/download");
+            ScarletUtil.openURL("http://" + scarletURL + "/");
         }
 
 
         /* WS */
         public void Scarlet_WS_Initialise()
         {
-            ws = new WebSocket("ws://scarlet.australianarmedforces.org:8080");
+            ws = new WebSocket("ws://" + scarletURL + ":" + scarletPort);
             
             ws.Connect();
 
@@ -122,44 +125,58 @@ namespace Scarlet
                 {
                     if (words[1] == IP || words[1] == "*")
                     {
-                        if (words[2] == "browserConnect")
+                        switch (words[2])
                         {
-                            if (backgroundWorker1.IsBusy == false)
-                            {
-                                ws.Send("Browser|" + IP + "|browserConfirmation|free");
-                            }
-                            else
-                            {
-                                ws.Send("Browser|" + IP + "|browserConfirmation|busy");
-                            }
-                        }
-                        if (words[2] == "startDownload")
-                        {
-                            installDirectory = words[3];
-                            if (backgroundWorker1.IsBusy == false)
-                            {
-                                backgroundWorker1.RunWorkerAsync();
-                            }
-                        }
-                        if (words[2] == "locationChange")
-                        {
-                            ChooseFolder();
-                        }
-                        if (words[2] == "updateInstallLocation")
-                        {
-                            installDirectory = words[3];
-                        }
-                        if (words[2] == "Broadcast")
-                        {
-                            MessageBox.Show(words[3], "Scarlet Updater", MessageBoxButtons.OK);
-                        }
-                        if (words[2] == "FetchAll")
-                        {
+                            case ("browserConnect"):
 
-                        }
-                        if (words[2] == "Quit")
-                        {
-                            Application.Exit();
+                                if (backgroundWorker1.IsBusy == false)
+                                {
+                                    ws.Send("Browser|" + IP + "|browserConfirmation|free");
+                                }
+                                else
+                                {
+                                    ws.Send("Browser|" + IP + "|browserConfirmation|busy");
+                                }
+                                break;
+
+                            case ("startDownload"):
+
+                                installDirectory = words[3];
+                                if (backgroundWorker1.IsBusy == false)
+                                {
+                                    backgroundWorker1.RunWorkerAsync();
+                                }
+                                break;
+
+                            case ("locationChange"):
+
+                                ChooseFolder();
+                                break;
+
+                            case ("updateInstallLocation"):
+
+                                installDirectory = words[3];
+                                break;
+
+                            case ("broadcast"):
+
+                                MessageBox.Show(words[3], "Scarlet Updater", MessageBoxButtons.OK);
+                                break;
+
+                            case ("fetchStatus"):
+
+                                pushStatusToBrowser();
+                                break;
+
+                            case ("quit"):
+
+                                Application.Exit();
+                                break;
+
+                            case ("restart"):
+
+                                Application.Restart();
+                                break;
                         }
                     }
                 }
@@ -175,18 +192,18 @@ namespace Scarlet
             ws.Connect();
         }
 
-        public void broadcastOpen()
+        public void pushStatusToBrowser()
         {
-
+            updateStatus(downloadStatus = " ");
+            updateFile(downloadCurrentFile);
+            updateProgress(downloadPercentage);
         }
 
         /* Tray */
         public void TrayIcon()
         {
-            // Create a simple tray menu with only one item.
-            trayMenu = new ContextMenu();
             trayMenu.MenuItems.Add("Attempt Reconnect", reconnect);
-            trayMenu.MenuItems.Add(new ToolStripSeparator().ToString());
+            trayMenu.MenuItems.Add("-");
             trayMenu.MenuItems.Add("Exit", ExitApplication);
 
             // Create a tray icon. In this example we use a
@@ -462,6 +479,11 @@ namespace Scarlet
             updateStatus(typer + " " /* + (Math.Round((double)(percentage * 100), 2).ToString()) + "%" */);
             updateFile(@currentFile);
             updateProgress(percentage);
+
+            // Update Mid-Progress
+            downloadPercentage = percentage;
+            downloadStatus = typer;
+            downloadCurrentFile = currentFile;
         }
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

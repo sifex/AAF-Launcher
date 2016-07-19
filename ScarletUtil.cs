@@ -7,13 +7,16 @@ using System.Security.Cryptography;
 using System.Text;
 using System;
 using MinimalJson;
+using System.Windows.Forms;
+using Scarlet.Properties;
 
 namespace Scarlet
 {
     class ScarletUtil
     {
+       
         // Check Current version on Server
-        public static void testConnection()
+        public static void testConnection(Scarlet ScarletForm)
         {
             try { ScarletAPI.Request(""); }
             catch (Exception ex)
@@ -24,9 +27,9 @@ namespace Scarlet
         }
 
         // Check Current version on Server
-        public static void checkVersion(string Version)
+        public static void checkVersion(Scarlet ScarletForm)
         {
-            var versionURL = "http://scarlet.australianarmedforces.org/api/";
+            var versionURL = "http://" + ScarletForm.scarletURL + "/api/";
             string versionNo = "";
             try
             {
@@ -37,7 +40,7 @@ namespace Scarlet
             {
 
             }
-            if (versionNo != Version)
+            if (versionNo != ScarletForm.Version)
             {
                 System.Windows.Forms.MessageBox.Show("This version is out of date, please download the updated version.");
                 Process.Start("http://mods.australianarmedforces.org/?update");
