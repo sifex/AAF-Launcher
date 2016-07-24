@@ -100,7 +100,7 @@ namespace Scarlet
 
         public void formLoad(object sender, EventArgs e)
         {
-            ScarletUtil.openURL("http://" + scarletURL + "/");
+            // ScarletUtil.openURL("http://" + scarletURL + "/");
         }
 
 
@@ -148,6 +148,11 @@ namespace Scarlet
                                 }
                                 break;
 
+                            case ("stopDownload"):
+
+                                backgroundWorker1.CancelAsync();
+                                break;
+
                             case ("locationChange"):
 
                                 ChooseFolder();
@@ -175,6 +180,7 @@ namespace Scarlet
 
                             case ("restart"):
 
+                                Program.restarting = true;
                                 Application.Restart();
                                 break;
                         }
@@ -245,7 +251,7 @@ namespace Scarlet
 
         protected void trayIcon_Click(object sender, EventArgs e)
         {
-            ScarletUtil.openURL("http://scarlet.australianarmedforces.org/download");
+            ScarletUtil.openURL("http://" + scarletURL + "/");
         }
 
         /* Downloader */
@@ -333,8 +339,21 @@ namespace Scarlet
 
             // Loads Server Repos XML
             XDocument xmlRepo = XDocument.Load(this.ServerRepo + "/repo.xml");
-            xmlRepo.Save(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/scarlet/repo.xml", SaveOptions.None);
-            xmlRepo = XDocument.Load(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/scarlet/repo.xml");
+
+            // Saves it to Scarlet's APPDATA Folder
+            string AppDataScarlet = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/Scarlet/";
+
+            // Delete Lowercase One
+            if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/scarlet/")) {
+                Directory.Delete(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/scarlet/", true);
+            }
+
+            // Create Directory & Save Repo XML
+            Directory.CreateDirectory(AppDataScarlet);
+            xmlRepo.Save(AppDataScarlet + "repo.xml", SaveOptions.None);
+            xmlRepo = XDocument.Load(AppDataScarlet + "repo.xml");
+
+            status = 12;
 
             // Fetches ModRoot Directory from Server, or Defaults to /Server_Mods/
             // Don't use /Mods/ as a folder as your clan will bug you to ask where their custom 1337 mods have gone! 

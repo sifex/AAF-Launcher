@@ -23,6 +23,7 @@ namespace Scarlet
     public static class Program
     {
         private static Mutex m_Mutex;
+        public static bool restarting = false;
 
         [STAThread]
         static void Main()
@@ -32,7 +33,7 @@ namespace Scarlet
 
             bool createdNew;
             m_Mutex = new Mutex(true, "Scarlet", out createdNew);
-            if (createdNew)
+            if (createdNew || restarting)
             {
                 Application.Run(new Scarlet());
             }
