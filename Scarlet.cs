@@ -164,7 +164,7 @@ namespace Scarlet
 
                             case ("broadcast"):
 
-                                MessageBox.Show(words[3], "Scarlet Updater", MessageBoxButtons.OK);
+                                broadcast(words[3]);
                                 break;
 
                             case ("fetchStatus"):
@@ -313,12 +313,37 @@ namespace Scarlet
                     folderBrowser.RootFolder = Environment.SpecialFolder.MyComputer;
                     folderBrowser.ShowNewFolderButton = true;
 
-                    owner.BringToFront();
+                    owner.WindowState = FormWindowState.Minimized;
+                    owner.Show();
+                    owner.WindowState = FormWindowState.Normal;
+
                     if (folderBrowser.ShowDialog(this) == DialogResult.OK)
                     {
                         ws.Send("Browser|" + IP + "|UpdateInstallLocation|" + folderBrowser.SelectedPath);
                         installDirectory = folderBrowser.SelectedPath;
                     }
+                }
+            });
+        }
+
+        public void broadcast(string Message)
+        {
+            this.Invoke((Action)delegate {
+
+                using (var owner = new Form()
+                {
+                    Width = 0,
+                    Height = 0,
+                    StartPosition = FormStartPosition.CenterScreen,
+                    Text = "Message"
+                })
+                {
+
+                    MessageBox.Show(Message, "Scarlet Updater", MessageBoxButtons.OK);
+
+                    owner.WindowState = FormWindowState.Minimized;
+                    owner.Show();
+                    owner.WindowState = FormWindowState.Normal;
                 }
             });
         }
