@@ -94,8 +94,7 @@ namespace Scarlet
         {
             ScarletUtil.testConnection(this);
             ScarletUtil.checkVersion(this);
-
-            IP = new WebClient().DownloadString("https://api.ipify.org");
+            IP = ScarletUtil.getExternalIP();
         }
 
         public void formLoad(object sender, EventArgs e)

@@ -48,6 +48,12 @@ namespace Scarlet
             }
         }
 
+        // Gets current IP
+        public static string getExternalIP()
+        {
+            return new WebClient().DownloadString("https://api.ipify.org");
+        }
+
         // Generates MD5 Hash of File
         public static string HashFile(FileStream stream)
         {
