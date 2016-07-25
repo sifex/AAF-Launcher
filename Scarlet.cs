@@ -20,7 +20,7 @@ namespace Scarlet
         public string Version = "1.0.1";
         public string scarletURL = "scarlet.australianarmedforces.org";
         public string scarletPort = "8080";
-        public bool dev = true;
+        public bool dev = false;
 
         // Change status codes to exceptions!
         public int status = 1;
