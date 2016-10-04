@@ -7,26 +7,34 @@ using System.Text;
 using WebSocketSharp;
 using System.Net;
 using System.ComponentModel;
+using System.Collections.Specialized;
 using System.IO;
 using System.Security.Cryptography;
 using System.Xml.Linq;
 
+using MinimalJson;
+
 using System.Diagnostics;
+using WebSocketSharp.Server;
 
 namespace Scarlet
 {
     public class Scarlet : Form
     {
         public string Version = "1.0.1";
-        public string scarletURL = "scarlet.australianarmedforces.org";
-        public string scarletPort = "8080";
-        public bool dev = true;
+        public string scarletURL = "127.0.0.1";
+        public string scarletPort = "1001";
+
+        public string ip;
+        public ScarletMetrics wsm;
+        public WebSocket ws;
 
         // Change status codes to exceptions!
         public int status = 1;
 
         public string ClanID;
         public string Username;
+        private string key;
         public string installDirectory;
         public string Server;
         public string ServerRepo = "http://mods.australianarmedforces.org/clans/2/repo";
@@ -40,10 +48,6 @@ namespace Scarlet
         public string downloadStatus;
         public string downloadCurrentFile;
 
-        // WS
-        WebSocket ws;
-        string IP;
-
         // Tray
         private NotifyIcon trayIcon;
         private ContextMenu trayMenu = new ContextMenu();
@@ -54,13 +58,6 @@ namespace Scarlet
 
         public Scarlet()
         {
-            if(dev == true)
-            {
-                scarletPort = "8080";
-                scarletURL = "staging.scarlet.australianarmedforces.org";
-                Version = "1.0.1";
-            }
-
             // Prep for Startup
             preStartup();
 
@@ -93,26 +90,36 @@ namespace Scarlet
         public void preStartup()
         {
             ScarletUtil.testConnection(this);
-            ScarletUtil.checkVersion(this);
-            IP = ScarletUtil.getExternalIP();
+            // ScarletUtil.checkVersion(this);
+            ip = ScarletUtil.getExternalIP();
+
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(onProcessExit);
         }
 
         public void formLoad(object sender, EventArgs e)
         {
             // ScarletUtil.openURL("http://" + scarletURL + "/");
         }
-
-
-        /* WS */
+        
         public void Scarlet_WS_Initialise()
         {
+            /* Scarlet Metrics */
+            wsm = new ScarletMetrics();
+            wsm.Send("Scarlet Service Started. (" + ip + ")");
+
+            /* Server */
+            var wssv = new WebSocketServer("ws://" + scarletURL + ":" + scarletPort);
+            wssv.AddWebSocketService<Link>("/");
+            wssv.Start();
+
+            /* Client */
             ws = new WebSocket("ws://" + scarletURL + ":" + scarletPort);
             
             ws.Connect();
 
             ws.OnOpen += (sender, e) =>
             {
-                ws.Send("Browser|" + IP + "|Connected");
+                ws.Send("Browser|Connected");
             };
 
             ws.OnMessage += (sender, e) =>
@@ -122,79 +129,94 @@ namespace Scarlet
                 string[] words = e.Data.Split('|');
                 if (words[0] == "Updater")
                 {
-                    if (words[1] == IP || words[1] == "*")
+                    switch (words[1])
                     {
-                        switch (words[2])
-                        {
-                            case ("browserConnect"):
+                        case ("browserConnect"):
+                            Username = words[2];
+                            key = ScarletAPI.Request("user", "info", words[2]);
 
-                                if (backgroundWorker1.IsBusy == false)
-                                {
-                                    ws.Send("Browser|" + IP + "|browserConfirmation|free");
-                                }
-                                else
-                                {
-                                    ws.Send("Browser|" + IP + "|browserConfirmation|busy");
-                                }
-                                break;
+                            if (backgroundWorker1.IsBusy == false)
+                            {
+                                ws.Send("Browser|browserConfirmation|free");
+                            }
+                            else
+                            {
+                                ws.Send("Browser|browserConfirmation|busy");
+                            }
+                            break;
 
-                            case ("startDownload"):
+                        case ("startDownload"):
 
-                                installDirectory = words[3];
-                                if (backgroundWorker1.IsBusy == false)
-                                {
-                                    backgroundWorker1.RunWorkerAsync();
-                                }
-                                break;
+                            installDirectory = words[2];
+                            if (backgroundWorker1.IsBusy == false)
+                            {
+                                backgroundWorker1.RunWorkerAsync();
+                            }
+                            break;
 
-                            case ("stopDownload"):
+                        case ("stopDownload"):
 
-                                backgroundWorker1.CancelAsync();
-                                break;
+                            backgroundWorker1.CancelAsync();
+                            break;
 
-                            case ("locationChange"):
+                        case ("locationChange"):
+                            /*
+                            installDirectory = words[2];
+                            NameValueCollection postData = new NameValueCollection();
+                            postData.Add("installDir", installDirectory);
 
-                                ChooseFolder();
-                                break;
+                            ScarletAPI.PostRequest("user", "install", key, "", postData);
+                            ws.Send("Browser|UpdateInstallLocation|" + installDirectory);
+                            */
+                            
+                            ChooseFolder();
 
-                            case ("updateInstallLocation"):
+                            break;
 
-                                installDirectory = words[3];
-                                break;
+                        case ("updateInstallLocation"):
 
-                            case ("broadcast"):
+                            installDirectory = words[2];
+                            break;
 
-                                MessageBox.Show(words[3], "Scarlet Updater", MessageBoxButtons.OK);
-                                break;
+                        case ("broadcast"):
 
-                            case ("fetchStatus"):
+                            MessageBox.Show(words[2], "Scarlet Updater", MessageBoxButtons.OK);
+                            break;
 
-                                pushStatusToBrowser();
-                                break;
+                        case ("fetchStatus"):
 
-                            case ("quit"):
+                            pushStatusToBrowser();
+                            break;
 
-                                Application.Exit();
-                                break;
+                        case ("quit"):
 
-                            case ("restart"):
+                            Application.Exit();
+                            break;
 
-                                Program.restarting = true;
-                                Application.Restart();
-                                break;
-                        }
+                        case ("restart"):
+
+                            Program.restarting = true;
+                            Application.Restart();
+                            break;
                     }
                 }
             };
-            
+
             ws.OnClose += (sender, e) =>
+            {
                 ws.Connect();
+            };
 
         }
 
         public void reconnect(object sender, EventArgs e)
         {
             ws.Connect();
+        }
+
+        public void ChooseFolderTray(object sender, EventArgs e)
+        {
+            ChooseFolder();
         }
 
         public void pushStatusToBrowser()
@@ -207,6 +229,7 @@ namespace Scarlet
         /* Tray */
         public void TrayIcon()
         {
+            trayMenu.MenuItems.Add("Change Install Directory", ChooseFolderTray);
             trayMenu.MenuItems.Add("Attempt Reconnect", reconnect);
             trayMenu.MenuItems.Add("-");
             trayMenu.MenuItems.Add("Exit", ExitApplication);
@@ -232,8 +255,14 @@ namespace Scarlet
             base.OnLoad(e);
         }
 
+        private void onProcessExit(object sender, EventArgs e)
+        {
+            wsm.Send("Scarlet Service Stopped. (" + ip + ")");
+        }
+
         private void ExitApplication(object sender, EventArgs e)
         {
+            wsm.Send("Scarlet Service Stopped. (" + ip + ")");
             Application.Exit();
         }
 
@@ -250,7 +279,7 @@ namespace Scarlet
 
         protected void trayIcon_Click(object sender, EventArgs e)
         {
-            ScarletUtil.openURL("http://" + scarletURL + "/");
+            ScarletUtil.openURL("http://staging.australianarmedforces.org/mods/download/");
         }
 
         /* Downloader */
@@ -263,9 +292,7 @@ namespace Scarlet
                 o[1] = colour;
             }
             o[0] = status;
-            ws.Send("Browser|" + IP + "|UpdateStatus|" + o[0] + "|" + o[1]);
-
-            // patchNotes.Document.InvokeScript("updateStatus", o);
+            ws.Send("Browser|UpdateStatus|" + o[0] + "|" + o[1]);
         }
 
         public void updateFile(string file, string colour = null)
@@ -276,9 +303,7 @@ namespace Scarlet
                 o[1] = colour;
             }
             o[0] = file;
-            ws.Send("Browser|" + IP + "|UpdateFile|" + o[0] + "|" + o[1]);
-
-            // patchNotes.Document.InvokeScript("updatefile", o);
+            ws.Send("Browser|UpdateFile|" + o[0] + "|" + o[1]);
 
         }
 
@@ -290,13 +315,14 @@ namespace Scarlet
                 o[1] = colour;
             }
             o[0] = progress;
-            ws.Send("Browser|" + IP + "|UpdateProgress|" + ((Math.Round((double)(progress * 100), 2).ToString())));
+            ws.Send("Browser|UpdateProgress|" + ((Math.Round((double)(progress * 100), 2).ToString())));
 
             // patchNotes.Document.InvokeScript("updateProgress", o);
         }
 
         public void ChooseFolder()
         {
+            installDirectory = JsonObject.readFrom(ScarletAPI.Request("user", "info", Username)).get("installDir").asString();
             this.Invoke((Action) delegate {
 
                 using (var owner = new Form()
@@ -310,13 +336,14 @@ namespace Scarlet
 
                     var folderBrowser = new FolderBrowserDialog();
                     folderBrowser.Description = "Select Scarlet Installation Folder";
-                    folderBrowser.RootFolder = Environment.SpecialFolder.MyComputer;
+                    folderBrowser.RootFolder = Environment.SpecialFolder.Desktop;
+                    folderBrowser.SelectedPath = installDirectory;
                     folderBrowser.ShowNewFolderButton = true;
 
                     owner.BringToFront();
                     if (folderBrowser.ShowDialog(this) == DialogResult.OK)
                     {
-                        ws.Send("Browser|" + IP + "|UpdateInstallLocation|" + folderBrowser.SelectedPath);
+                        ws.Send("Browser|UpdateInstallLocation|" + folderBrowser.SelectedPath);
                         installDirectory = folderBrowser.SelectedPath;
                     }
                 }
@@ -458,12 +485,18 @@ namespace Scarlet
                                     File.Delete(str3);
                                     this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
                                     downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
+                                    wsm.Send("(" + ip + ") " + Username + " is Fetching File: " + str2 + " to");
+                                }
+                                else
+                                {
+                                    wsm.Send("(" + ip + ") " + Username + " Verified File: " + str2 + " to");
                                 }
                             }
                             else
                             {
                                 this.Invoke(new Action(() => { downloadLbl_Controller(percent, 0, str2); }));
                                 downloadFile(sUrlToReadFileFrom, str3, percent, fileList);
+                                wsm.Send("(" + ip + ") " + Username + " is Fetching File: " + str2 + " to");
                             }
                         }
                     }
@@ -510,43 +543,55 @@ namespace Scarlet
             {
                 case 1:
                     updateStatus("Error Code: 000" + status + " - " + "Unknown Error Occurred. Please contact Server Admin.", "203, 76, 0");
+                    wsm.Send("Error Code: 000" + status + " - " + "Unknown Error Occurred. Please contact Server Admin.");
                     break;
                 case 2:
                     updateStatus("Error Code: 000" + status + " - " + "Check Version or IEChangeVersion Error.", "203, 76, 0");
+                    wsm.Send("Error Code: 000" + status + " - " + "Check Version or IEChangeVersion Error.");
                     break;
                 case 3:
                     updateStatus("Error Code: 000" + status + " - " + "Failed to find Arma 3 Root Directory.", "203, 76, 0");
+                    wsm.Send("Error Code: 000" + status + " - " + "Failed to find Arma 3 Root Directory.");
                     break;
                 case 4:
                     updateStatus("Error Code: 000" + status + " - " + "Failed to create " + ModsDirName + " directory. Are you sure you don't have it open?", "203, 76, 0");
+                    wsm.Send("Error Code: 000" + status + " - " + "Failed to create " + ModsDirName + " directory. Are you sure you don't have it open?");
                     break;
                 case 5:
                     updateStatus("Error Code: 000" + status + " - " + "Failed to remove extra existing folders.", "203, 76, 0");
+                    wsm.Send("Error Code: 000" + status + " - " + "Failed to remove extra existing folders.");
                     break;
                 case 6:
                     updateStatus("Error Code: 000" + status + " - " + "Failed to remove extra existing files.", "203, 76, 0");
+                    wsm.Send("Error Code: 000" + status + " - " + "Failed to remove extra existing files.");
                     break;
                 case 7:
                     updateStatus("Error Code: 000" + status + " - " + "Failed to successfully download mods.", "203, 76, 0");
+                    wsm.Send("Error Code: 000" + status + " - " + "Failed to successfully download mods.");
                     break;
                 case 8:
                     updateStatus("Error Code: 000" + status + " - " + "Cannot connect to update server", "203, 76, 0");
+                    wsm.Send("Error Code: 000" + status + " - " + "Cannot connect to update server");
                     break;
                 case 9:
                     updateStatus("Error Code: 000" + status + " - " + "Files Processed does not equal Files Retrieved. Please contact Server Admin.", "203, 76, 0");
+                    wsm.Send("Error Code: 000" + status + " - " + "Files Processed does not equal Files Retrieved. Please contact Server Admin.");
                     break;
                 case 11:
                     updateStatus("Error Code: 00" + status + " - " + "Failed to find ARMA 3 Directory. Looking for " + Root, "203, 76, 0");
+                    wsm.Send("Error Code: 00" + status + " - " + "Failed to find ARMA 3 Directory. Looking for " + Root);
                     break;
                 case 10:
                     updateStatus("Mods are up to date. Ready to Launch.", "100, 206, 63");
-                    ws.Send("Browser|" + IP + "|Completed");
+                    wsm.Send("Mods are up to date. Ready to Launch.");
+                    ws.Send("Browser|Completed");
                     updateFile("");
 
                     updateProgress(1.0, "100, 206, 63");
                     break;
                 default:
                     updateStatus("Unknown Error - Code: " + status, "203, 76, 0");
+                    wsm.Send("Unknown Error - Code: " + status);
                     break;
             }
         }

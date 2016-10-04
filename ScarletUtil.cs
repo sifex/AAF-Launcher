@@ -51,7 +51,7 @@ namespace Scarlet
         // Gets current IP
         public static string getExternalIP()
         {
-            return new WebClient().DownloadString("https://api.ipify.org");
+            return JsonObject.readFrom(ScarletAPI.Request("ip", "", "", "")).get("ip").asString();
         }
 
         // Generates MD5 Hash of File
