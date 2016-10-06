@@ -177,10 +177,9 @@ namespace Scarlet
 
                             installDirectory = words[2];
                             break;
-
+                            
                         case ("broadcast"):
-
-                            MessageBox.Show(words[2], "Scarlet Updater", MessageBoxButtons.OK);
+                            broadcast(words[3]);
                             break;
 
                         case ("fetchStatus"):
@@ -219,6 +218,11 @@ namespace Scarlet
             ChooseFolder();
         }
 
+        public void MontyFacebook(object sender, EventArgs e)
+        {
+            ScarletUtil.openURL("https://www.facebook.com/james.monfries");
+        }
+
         public void pushStatusToBrowser()
         {
             updateStatus(downloadStatus = " ");
@@ -229,6 +233,7 @@ namespace Scarlet
         /* Tray */
         public void TrayIcon()
         {
+            trayMenu.MenuItems.Add("Much Attraction. Very Face.", MontyFacebook);
             trayMenu.MenuItems.Add("Change Install Directory", ChooseFolderTray);
             trayMenu.MenuItems.Add("Attempt Reconnect", reconnect);
             trayMenu.MenuItems.Add("-");
@@ -279,7 +284,7 @@ namespace Scarlet
 
         protected void trayIcon_Click(object sender, EventArgs e)
         {
-            ScarletUtil.openURL("http://staging.australianarmedforces.org/mods/download/");
+            ScarletUtil.openURL("https://australianarmedforces.org/mods/download/");
         }
 
         /* Downloader */
@@ -340,12 +345,37 @@ namespace Scarlet
                     folderBrowser.SelectedPath = installDirectory;
                     folderBrowser.ShowNewFolderButton = true;
 
-                    owner.BringToFront();
+                    owner.WindowState = FormWindowState.Minimized;
+                    owner.Show();
+                    owner.WindowState = FormWindowState.Normal;
+
                     if (folderBrowser.ShowDialog(this) == DialogResult.OK)
                     {
                         ws.Send("Browser|UpdateInstallLocation|" + folderBrowser.SelectedPath);
                         installDirectory = folderBrowser.SelectedPath;
                     }
+                }
+            });
+        }
+
+        public void broadcast(string Message)
+        {
+            this.Invoke((Action)delegate {
+
+                using (var owner = new Form()
+                {
+                    Width = 0,
+                    Height = 0,
+                    StartPosition = FormStartPosition.CenterScreen,
+                    Text = "Message"
+                })
+                {
+
+                    MessageBox.Show(Message, "Scarlet Updater", MessageBoxButtons.OK);
+
+                    owner.WindowState = FormWindowState.Minimized;
+                    owner.Show();
+                    owner.WindowState = FormWindowState.Normal;
                 }
             });
         }
@@ -460,11 +490,11 @@ namespace Scarlet
             {
                 if (backgroundWorker1.CancellationPending)
                 {
+
                     e.Cancel = true;
                     break;
                 }
-                else
-                {
+                else {
                     string str2 = xelement.Element("name").Value;
                     string a = xelement.Element("hash").Value;
                     string sUrlToReadFileFrom = this.ServerRepo + "/" + str2;
@@ -504,6 +534,7 @@ namespace Scarlet
                     filesDone++;
                     backgroundWorker1.ReportProgress((int)(percent * 710));
                 }
+                
             }
             if (filesDone == fileList)
             {
@@ -612,6 +643,10 @@ namespace Scarlet
                         int count;
                         while ((count = stream1.Read(buffer, 0, buffer.Length)) > 0)
                         {
+                            if (backgroundWorker1.CancellationPending)
+                            {
+                                return;
+                            }
                             stream2.Write(buffer, 0, count);
                             num += count;
                             try { this.Invoke(new Action(() => { updateStatus("Downloading Mods (" + (num / 1024).ToString("N0") + " KB / " + (contentLength / 1024).ToString("N0") + " KB)"); })); }

@@ -29,7 +29,7 @@ namespace Scarlet
         // Check Current version on Server
         public static void checkVersion(Scarlet ScarletForm)
         {
-            var versionURL = "http://" + ScarletForm.scarletURL + "/api/";
+            var versionURL = "https://" + ScarletForm.scarletURL + "/api/";
             string versionNo = "";
             try
             {
@@ -40,7 +40,12 @@ namespace Scarlet
             {
 
             }
-            if (versionNo != ScarletForm.Version)
+            if (versionNo == "Maintenance Mode")
+            {
+                System.Windows.Forms.MessageBox.Show("Scarlet is currently under maintainance. Please poke Omega to fix it.");
+                Environment.Exit(0);
+            }
+            else if (versionNo != ScarletForm.Version)
             {
                 System.Windows.Forms.MessageBox.Show("This version is out of date, please download the updated version.");
                 Process.Start("http://mods.australianarmedforces.org/?update");

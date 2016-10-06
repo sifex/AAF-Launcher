@@ -31,3 +31,4 @@ C:\Users\Alex\Source\Repos\AAF-Launcher\obj\Debug\Scarlet.csprojResolveAssemblyR
 C:\Users\Alex\Source\Repos\AAF-Launcher\obj\Debug\Scarlet.Properties.Resources.resources
 C:\Users\Alex\Source\Repos\AAF-Launcher\obj\Debug\Scarlet.csproj.GenerateResource.Cache
 C:\Users\Alex\Desktop\Scarlet\obj\Debug\Scarlet.Scarlet.resources
+C:\Users\Alex\Source\Repos\AAF-Launcher\obj\Debug\Scarlet.Scarlet.resources
