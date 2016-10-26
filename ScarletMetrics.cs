@@ -9,7 +9,7 @@ namespace Scarlet
 {
     public class ScarletMetrics
     {
-        private string MetricsWSURL = "ws.scarlet.australianarmedforces.org";
+        private string MetricsWSURL = "scarlet.australianarmedforces.org";
         private string MetricsWSPort = "9090";
         private WebSocket metricsws;
 
@@ -35,6 +35,9 @@ namespace Scarlet
             };
 
             metricsws.OnClose += (sender, e ) =>
+                metricsws.Connect();
+
+            metricsws.OnError += (sender, e) =>
                 metricsws.Connect();
         }
         public void Send(string message)

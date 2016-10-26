@@ -56,6 +56,9 @@ namespace Scarlet
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         delegate void UpdateDelegate(string text);
 
+        public bool verifyOnly = false;
+        public int noOfFilesToBeDownloaded = 0;
+
         public Scarlet()
         {
             // Prep for Startup
@@ -154,6 +157,16 @@ namespace Scarlet
                             }
                             break;
 
+                        case ("startVerify"):
+
+                            verifyOnly = true;
+                            installDirectory = words[2];
+                            if (backgroundWorker1.IsBusy == false)
+                            {
+                                backgroundWorker1.RunWorkerAsync();
+                            }
+                            break;
+
                         case ("stopDownload"):
 
                             backgroundWorker1.CancelAsync();
@@ -218,11 +231,6 @@ namespace Scarlet
             ChooseFolder();
         }
 
-        public void MontyFacebook(object sender, EventArgs e)
-        {
-            ScarletUtil.openURL("https://www.facebook.com/james.monfries");
-        }
-
         public void pushStatusToBrowser()
         {
             updateStatus(downloadStatus = " ");
@@ -233,7 +241,6 @@ namespace Scarlet
         /* Tray */
         public void TrayIcon()
         {
-            trayMenu.MenuItems.Add("Much Attraction. Very Face.", MontyFacebook);
             trayMenu.MenuItems.Add("Change Install Directory", ChooseFolderTray);
             trayMenu.MenuItems.Add("Attempt Reconnect", reconnect);
             trayMenu.MenuItems.Add("-");
@@ -275,7 +282,6 @@ namespace Scarlet
         {
             if (isDisposing)
             {
-                // Release the icon resource.
                 trayIcon.Dispose();
             }
 
@@ -284,10 +290,8 @@ namespace Scarlet
 
         protected void trayIcon_Click(object sender, EventArgs e)
         {
-            ScarletUtil.openURL("https://australianarmedforces.org/mods/download/");
+            ScarletUtil.openURL("https://australianarmedforces.org/mods/download/?username=" + Username);
         }
-
-        /* Downloader */
         
         public void updateStatus(string status, string colour = null)
         {
@@ -321,8 +325,6 @@ namespace Scarlet
             }
             o[0] = progress;
             ws.Send("Browser|UpdateProgress|" + ((Math.Round((double)(progress * 100), 2).ToString())));
-
-            // patchNotes.Document.InvokeScript("updateProgress", o);
         }
 
         public void ChooseFolder()
@@ -338,7 +340,6 @@ namespace Scarlet
                     Text = "Browse for Folder"
                 })
                 {
-
                     var folderBrowser = new FolderBrowserDialog();
                     folderBrowser.Description = "Select Scarlet Installation Folder";
                     folderBrowser.RootFolder = Environment.SpecialFolder.Desktop;
@@ -398,11 +399,6 @@ namespace Scarlet
 
             // Saves it to Scarlet's APPDATA Folder
             string AppDataScarlet = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/Scarlet/";
-
-            // Delete Lowercase One
-            if (Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/scarlet/")) {
-                Directory.Delete(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/scarlet/", true);
-            }
 
             // Create Directory & Save Repo XML
             Directory.CreateDirectory(AppDataScarlet);
@@ -570,6 +566,7 @@ namespace Scarlet
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            verifyOnly = false;
             switch (status)
             {
                 case 1:
