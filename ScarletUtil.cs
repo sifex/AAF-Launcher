@@ -29,7 +29,7 @@ namespace Scarlet
         // Check Current version on Server
         public static void checkVersion(Scarlet ScarletForm)
         {
-            var versionURL = "https://" + ScarletForm.scarletURL + "/api/";
+            var versionURL = "https://" + ScarletForm.scarletAgentURL + "/api/";
             string versionNo = "";
             try
             {

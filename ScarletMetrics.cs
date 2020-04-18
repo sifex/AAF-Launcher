@@ -24,22 +24,11 @@ namespace Scarlet
             {
                 // Metrics - On Connection to the Metrics WS Reporting Server
                 // Need to include username / IP in here as well.
-                JsonObject jsonMessage = new JsonObject()
-                    .add("type", "metrics")
-                    .add("message", "connected");
-                metricsws.Send(jsonMessage.ToString());
+                metricsws.Send("connected");
             };
 
-            metricsws.OnMessage += (sender, e) =>
-            {
-            };
-
-            metricsws.OnClose += (sender, e ) =>
-                metricsws.Connect();
-
-            metricsws.OnError += (sender, e) =>
-                metricsws.Connect();
         }
+
         public void Send(string message)
         {
             JsonObject jsonMessage = new JsonObject();

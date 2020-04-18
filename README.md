@@ -1,3 +1,3 @@
-# Scarlet
+# Scarlet Agent
 
-![http://staging.scarlet.australianarmedforces.org/api/build-badge](http://staging.scarlet.australianarmedforces.org/api/build-badge)
+For full readme, visit https://github.com/sifex/scarlet

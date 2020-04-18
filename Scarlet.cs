@@ -21,9 +21,9 @@ namespace Scarlet
 {
     public class Scarlet : Form
     {
-        public string Version = "1.0.1";
-        public string scarletURL = "127.0.0.1";
-        public string scarletPort = "1001";
+        public string Version = "1.3.0";
+        public string scarletAgentURL = "127.0.0.1";
+        public string scarletAgentPort = "2074";
 
         public string ip;
         public ScarletMetrics wsm;
@@ -68,20 +68,15 @@ namespace Scarlet
             Scarlet_WS_Initialise();
 
             // Initalise Form
-            InitializeComponent();
+            InitBackgroundWorker();
 
             // Initalise Tray Icon
             TrayIcon();
 
         }
 
-        private void InitializeComponent()
+        private void InitBackgroundWorker()
         {
-            this.SuspendLayout();
-            this.ClientSize = new System.Drawing.Size(284, 261);
-            this.Name = "Scarlet";
-            this.Load += new System.EventHandler(this.formLoad);
-            this.ResumeLayout(true);
 
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker1.WorkerReportsProgress = true;
@@ -93,15 +88,10 @@ namespace Scarlet
         public void preStartup()
         {
             ScarletUtil.testConnection(this);
-            // ScarletUtil.checkVersion(this);
+            
             ip = ScarletUtil.getExternalIP();
 
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(onProcessExit);
-        }
-
-        public void formLoad(object sender, EventArgs e)
-        {
-            // ScarletUtil.openURL("http://" + scarletURL + "/");
         }
         
         public void Scarlet_WS_Initialise()
@@ -111,12 +101,12 @@ namespace Scarlet
             wsm.Send("Scarlet Service Started. (" + ip + ")");
 
             /* Server */
-            var wssv = new WebSocketServer("ws://" + scarletURL + ":" + scarletPort);
+            var wssv = new WebSocketServer("ws://" + scarletAgentURL + ":" + scarletAgentPort);
             wssv.AddWebSocketService<Link>("/");
             wssv.Start();
 
             /* Client */
-            ws = new WebSocket("ws://" + scarletURL + ":" + scarletPort);
+            ws = new WebSocket("ws://" + scarletAgentURL + ":" + scarletAgentPort);
             
             ws.Connect();
 
@@ -170,18 +160,11 @@ namespace Scarlet
                         case ("stopDownload"):
 
                             backgroundWorker1.CancelAsync();
+                            ws.Send("Browser|browserConfirmation|free");
                             break;
 
                         case ("locationChange"):
-                            /*
-                            installDirectory = words[2];
-                            NameValueCollection postData = new NameValueCollection();
-                            postData.Add("installDir", installDirectory);
 
-                            ScarletAPI.PostRequest("user", "install", key, "", postData);
-                            ws.Send("Browser|UpdateInstallLocation|" + installDirectory);
-                            */
-                            
                             ChooseFolder();
 
                             break;
@@ -231,6 +214,15 @@ namespace Scarlet
             ChooseFolder();
         }
 
+        public void OpenScarletElectronApp(object sender, EventArgs e)
+        {
+            Debug.WriteLine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Programs\Scarlet\Scarlet.exe"));
+
+            System.Diagnostics.Process.Start(
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Programs\Scarlet\Scarlet.exe")
+            );
+        }
+
         public void pushStatusToBrowser()
         {
             updateStatus(downloadStatus = " ");
@@ -241,6 +233,8 @@ namespace Scarlet
         /* Tray */
         public void TrayIcon()
         {
+            trayMenu.MenuItems.Add("Open Scarlet Launcher", OpenScarletElectronApp);
+            trayMenu.MenuItems.Add("-");
             trayMenu.MenuItems.Add("Change Install Directory", ChooseFolderTray);
             trayMenu.MenuItems.Add("Attempt Reconnect", reconnect);
             trayMenu.MenuItems.Add("-");
@@ -290,7 +284,7 @@ namespace Scarlet
 
         protected void trayIcon_Click(object sender, EventArgs e)
         {
-            ScarletUtil.openURL("https://australianarmedforces.org/mods/download/?username=" + Username);
+            OpenScarletElectronApp(sender, e);
         }
         
         public void updateStatus(string status, string colour = null)
@@ -554,7 +548,7 @@ namespace Scarlet
                 typer = "Downloading";
             }
 
-            updateStatus(typer + " " /* + (Math.Round((double)(percentage * 100), 2).ToString()) + "%" */);
+            updateStatus(typer);
             updateFile(@currentFile);
             updateProgress(percentage);
 
@@ -567,60 +561,64 @@ namespace Scarlet
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             verifyOnly = false;
-            switch (status)
-            {
-                case 1:
-                    updateStatus("Error Code: 000" + status + " - " + "Unknown Error Occurred. Please contact Server Admin.", "203, 76, 0");
-                    wsm.Send("Error Code: 000" + status + " - " + "Unknown Error Occurred. Please contact Server Admin.");
-                    break;
-                case 2:
-                    updateStatus("Error Code: 000" + status + " - " + "Check Version or IEChangeVersion Error.", "203, 76, 0");
-                    wsm.Send("Error Code: 000" + status + " - " + "Check Version or IEChangeVersion Error.");
-                    break;
-                case 3:
-                    updateStatus("Error Code: 000" + status + " - " + "Failed to find Arma 3 Root Directory.", "203, 76, 0");
-                    wsm.Send("Error Code: 000" + status + " - " + "Failed to find Arma 3 Root Directory.");
-                    break;
-                case 4:
-                    updateStatus("Error Code: 000" + status + " - " + "Failed to create " + ModsDirName + " directory. Are you sure you don't have it open?", "203, 76, 0");
-                    wsm.Send("Error Code: 000" + status + " - " + "Failed to create " + ModsDirName + " directory. Are you sure you don't have it open?");
-                    break;
-                case 5:
-                    updateStatus("Error Code: 000" + status + " - " + "Failed to remove extra existing folders.", "203, 76, 0");
-                    wsm.Send("Error Code: 000" + status + " - " + "Failed to remove extra existing folders.");
-                    break;
-                case 6:
-                    updateStatus("Error Code: 000" + status + " - " + "Failed to remove extra existing files.", "203, 76, 0");
-                    wsm.Send("Error Code: 000" + status + " - " + "Failed to remove extra existing files.");
-                    break;
-                case 7:
-                    updateStatus("Error Code: 000" + status + " - " + "Failed to successfully download mods.", "203, 76, 0");
-                    wsm.Send("Error Code: 000" + status + " - " + "Failed to successfully download mods.");
-                    break;
-                case 8:
-                    updateStatus("Error Code: 000" + status + " - " + "Cannot connect to update server", "203, 76, 0");
-                    wsm.Send("Error Code: 000" + status + " - " + "Cannot connect to update server");
-                    break;
-                case 9:
-                    updateStatus("Error Code: 000" + status + " - " + "Files Processed does not equal Files Retrieved. Please contact Server Admin.", "203, 76, 0");
-                    wsm.Send("Error Code: 000" + status + " - " + "Files Processed does not equal Files Retrieved. Please contact Server Admin.");
-                    break;
-                case 11:
-                    updateStatus("Error Code: 00" + status + " - " + "Failed to find ARMA 3 Directory. Looking for " + Root, "203, 76, 0");
-                    wsm.Send("Error Code: 00" + status + " - " + "Failed to find ARMA 3 Directory. Looking for " + Root);
-                    break;
-                case 10:
-                    updateStatus("Mods are up to date. Ready to Launch.", "100, 206, 63");
-                    wsm.Send("Mods are up to date. Ready to Launch.");
-                    ws.Send("Browser|Completed");
-                    updateFile("");
 
-                    updateProgress(1.0, "100, 206, 63");
-                    break;
-                default:
-                    updateStatus("Unknown Error - Code: " + status, "203, 76, 0");
-                    wsm.Send("Unknown Error - Code: " + status);
-                    break;
+            if (!e.Cancelled)
+            {
+                switch (status)
+                {
+                    case 1:
+                        updateStatus("Unknown Error Occurred. Please contact Server Admin. (Error Code: " + status + ")", "203, 76, 0");
+                        wsm.Send("Unknown Error Occurred. Please contact Server Admin. (Error Code: " + status + ")");
+                        break;
+                    case 2:
+                        updateStatus("Check Version or IEChangeVersion Error. (Error Code: " + status + ")", "203, 76, 0");
+                        wsm.Send("Check Version or IEChangeVersion Error. (Error Code: " + status + ")");
+                        break;
+                    case 3:
+                        updateStatus("Failed to find Arma 3 Root Directory. (Error Code: " + status + ")", "203, 76, 0");
+                        wsm.Send("Failed to find Arma 3 Root Directory. (Error Code: " + status + ")");
+                        break;
+                    case 4:
+                        updateStatus("Failed to create " + ModsDirName + " directory. Are you sure you don't have it open? (Error Code: " + status + ")", "203, 76, 0");
+                        wsm.Send("Failed to create " + ModsDirName + " directory. Are you sure you don't have it open? (Error Code: " + status + ")");
+                        break;
+                    case 5:
+                        updateStatus("Permissions Failure. Can't read the folder " + ModsDirName + ". (Error Code: " + status + ")", "203, 76, 0");
+                        wsm.Send("Permissions Failure. Can't read the folder " + ModsDirName + ". (Error Code: " + status + ")");
+                        break;
+                    case 6:
+                        updateStatus("Failed to remove extra existing files. (Error Code: " + status + ")", "203, 76, 0");
+                        wsm.Send("Failed to remove extra existing files. (Error Code: " + status + ")");
+                        break;
+                    case 7:
+                        updateStatus("Failed to successfully download mods. (Error Code: " + status + ")", "203, 76, 0");
+                        wsm.Send("Failed to successfully download mods. (Error Code: " + status + ")");
+                        break;
+                    case 8:
+                        updateStatus("Cannot connect to update server (Error Code: " + status + ")", "203, 76, 0");
+                        wsm.Send("Cannot connect to update server (Error Code: " + status + ")");
+                        break;
+                    case 9:
+                        updateStatus("Files Processed does not equal Files Retrieved. Please contact Server Admin. (Error Code: " + status + ")", "203, 76, 0");
+                        wsm.Send("Files Processed does not equal Files Retrieved. Please contact Server Admin. (Error Code: " + status + ")");
+                        break;
+                    case 11:
+                        updateStatus("Failed to find ARMA 3 Directory. Looking for " + Root + " (Error Code: " + status + ")", "203, 76, 0");
+                        wsm.Send("Failed to find ARMA 3 Directory. Looking for " + Root + " (Error Code: " + status + ")");
+                        break;
+                    case 10:
+                        updateStatus("Mods are up to date. Ready to Launch.", "46, 173, 93");
+                        wsm.Send("Mods are up to date. Ready to Launch.");
+                        ws.Send("Browser|Completed");
+                        updateFile("");
+
+                        updateProgress(1.0, "100, 206, 63");
+                        break;
+                    default:
+                        updateStatus("Unknown Error - Code: " + status, "203, 76, 0");
+                        wsm.Send("Unknown Error - Code: " + status);
+                        break;
+                }
             }
         }
 
