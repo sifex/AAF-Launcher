@@ -56,7 +56,7 @@ namespace Scarlet
         // Gets current IP
         public static string getExternalIP()
         {
-            return JsonObject.readFrom(ScarletAPI.Request("ip", "", "", "")).get("ip").asString();
+            return JsonObject.readFrom(ScarletAPI.Request("", "", "", "")).get("ip").asString();
         }
 
         // Generates MD5 Hash of File
