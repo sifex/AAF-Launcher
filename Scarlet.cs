@@ -570,17 +570,9 @@ namespace Scarlet
                         updateStatus("Unknown Error Occurred. Please contact Server Admin. (Error Code: " + status + ")", "203, 76, 0");
                         wsm.Send("Unknown Error Occurred. Please contact Server Admin. (Error Code: " + status + ")");
                         break;
-                    case 2:
-                        updateStatus("Check Version or IEChangeVersion Error. (Error Code: " + status + ")", "203, 76, 0");
-                        wsm.Send("Check Version or IEChangeVersion Error. (Error Code: " + status + ")");
-                        break;
-                    case 3:
-                        updateStatus("Failed to find Arma 3 Root Directory. (Error Code: " + status + ")", "203, 76, 0");
-                        wsm.Send("Failed to find Arma 3 Root Directory. (Error Code: " + status + ")");
-                        break;
                     case 4:
-                        updateStatus("Failed to create " + ModsDirName + " directory. Are you sure you don't have it open? (Error Code: " + status + ")", "203, 76, 0");
-                        wsm.Send("Failed to create " + ModsDirName + " directory. Are you sure you don't have it open? (Error Code: " + status + ")");
+                        updateStatus("Failed to create " + ModsDirName + " directory. (Error Code: " + status + ")", "203, 76, 0");
+                        wsm.Send("Failed to create " + ModsDirName + " directory. (Error Code: " + status + ")");
                         break;
                     case 5:
                         updateStatus("Permissions Failure. Can't read the folder " + ModsDirName + ". (Error Code: " + status + ")", "203, 76, 0");
@@ -603,8 +595,8 @@ namespace Scarlet
                         wsm.Send("Files Processed does not equal Files Retrieved. Please contact Server Admin. (Error Code: " + status + ")");
                         break;
                     case 11:
-                        updateStatus("Failed to find ARMA 3 Directory. Looking for " + Root + " (Error Code: " + status + ")", "203, 76, 0");
-                        wsm.Send("Failed to find ARMA 3 Directory. Looking for " + Root + " (Error Code: " + status + ")");
+                        updateStatus("Folder does not exist, " + Root + " (Error Code: " + status + ")", "203, 76, 0");
+                        wsm.Send("Folder does not exist, " + Root + " (Error Code: " + status + ")");
                         break;
                     case 10:
                         updateStatus("Mods are up to date. Ready to Launch.", "46, 173, 93");
