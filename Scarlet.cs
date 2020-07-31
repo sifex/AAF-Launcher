@@ -29,7 +29,7 @@ namespace Scarlet
         public ScarletMetrics wsm;
         public WebSocket ws;
 
-        // Change status codes to exceptions!
+        // TODO Change status codes to exceptions!
         public int status = 1;
 
         public string ClanID;
@@ -323,7 +323,14 @@ namespace Scarlet
 
         public void ChooseFolder()
         {
-            installDirectory = JsonObject.readFrom(ScarletAPI.Request("user", "info", Username)).get("installDir").asString();
+            var installDirFromAPI = JsonObject.readFrom(ScarletAPI.Request("user", "info", Username)).get("installDir");
+            if(!installDirFromAPI.isString()) {
+                installDirectory = "";
+            } else
+            {
+                installDirectory = installDirFromAPI.asString();
+            }
+            
             this.Invoke((Action) delegate {
 
                 using (var owner = new Form()
